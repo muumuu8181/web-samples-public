@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シンプル同期テスト</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        .status {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #taskInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            min-width: 120px;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .add-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tasks-container {
+            text-align: left;
+        }
+
+        .tasks-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .task-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .task-text {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .task-meta {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .device-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 リアルタイム同期テスト</h1>
+        
+        <div class="status disconnected" id="status">
+            🔄 Firebase に接続中...
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="taskInput" placeholder="タスクを入力してください..." />
+            <button class="add-btn" onclick="addTask()">追加</button>
+        </div>
+
+        <div class="tasks-container">
+            <h2 class="tasks-title">📝 同期されたタスク</h2>
+            <div id="tasksList">
+                <div class="empty-state">
+                    まだタスクがありません。<br>
+                    上の入力欄からタスクを追加してみてください！
+                </div>
+            </div>
+        </div>
+
+        <div class="device-info">
+            <strong>現在の端末:</strong> <span id="deviceInfo"></span><br>
+            <strong>URL:</strong> <span id="currentUrl"></span>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // デバイス情報表示
+        document.getElementById('deviceInfo').textContent = `${navigator.platform} - ${navigator.userAgent.split(' ')[0]}`;
+        document.getElementById('currentUrl').textContent = window.location.href;
+
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5PXKChizYDCXF_GJ4KL6Ylq9K5hCPXWE",
+            authDomain: "shares-b1b97.firebaseapp.com",
+            databaseURL: "https://shares-b1b97-default-rtdb.firebaseio.com",
+            projectId: "shares-b1b97",
+            storageBucket: "shares-b1b97.firebasestorage.app",
+            messagingSenderId: "38311063248",
+            appId: "1:38311063248:web:0d2d5726d12b305b24b8d5"
+        };
+
+        let database = null;
+        let tasksRef = null;
+        let isConnected = false;
+
+        // Firebase初期化
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            tasksRef = database.ref('sync-test-tasks');
+            
+            // 接続状態監視
+            database.ref('.info/connected').on('value', (snap) => {
+                const statusEl = document.getElementById('status');
+                if (snap.val() === true) {
+                    isConnected = true;
+                    statusEl.textContent = '✅ Firebase に接続済み - リアルタイム同期中';
+                    statusEl.className = 'status connected';
+                } else {
+                    isConnected = false;
+                    statusEl.textContent = '❌ Firebase 接続エラー';
+                    statusEl.className = 'status disconnected';
+                }
+            });
+
+            // リアルタイム同期
+            tasksRef.on('value', (snapshot) => {
+                const tasks = snapshot.val() || {};
+                displayTasks(tasks);
+            });
+
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            document.getElementById('status').textContent = '❌ Firebase 初期化エラー';
+        }
+
+        // タスク追加
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            
+            if (text && tasksRef) {
+                const task = {
+                    text: text,
+                    timestamp: Date.now(),
+                    device: navigator.platform,
+                    userAgent: navigator.userAgent.substring(0, 50)
+                };
+                
+                tasksRef.push(task);
+                input.value = '';
+            } else if (!tasksRef) {
+                alert('Firebase に接続していません');
+            }
+        }
+
+        // タスク表示
+        function displayTasks(tasks) {
+            const tasksList = document.getElementById('tasksList');
+            
+            if (Object.keys(tasks).length === 0) {
+                tasksList.innerHTML = `
+                    <div class="empty-state">
+                        まだタスクがありません。<br>
+                        上の入力欄からタスクを追加してみてください！
+                    </div>
+                `;
+                return;
+            }
+
+            // 新しい順にソート
+            const sortedTasks = Object.entries(tasks).sort((a, b) => b[1].timestamp - a[1].timestamp);
+            
+            tasksList.innerHTML = sortedTasks.map(([id, task]) => `
+                <div class="task-item">
+                    <div class="task-text">${task.text}</div>
+                    <div class="task-meta">
+                        <span>📱 ${task.device}</span>
+                        <span>🕒 ${new Date(task.timestamp).toLocaleString()}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Enterキーで追加
+        document.getElementById('taskInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+    </script>
+</body>
+</html>
