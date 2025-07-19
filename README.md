@@ -27,7 +27,9 @@
 
 ## 🌐 ライブデモ
 
-https://muumuu8181.github.io/web-samples-public/
+- **アプリ一覧**: https://muumuu8181.github.io/web-samples-public/
+- **サンプルページ**: https://muumuu8181.github.io/web-samples-public/samples.html
+- **同期タスク**: https://muumuu8181.github.io/web-samples-public/simple-sync.html
 
 ## 📱 対応環境
 

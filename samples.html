@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Samples Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Left Sidebar */
+        .sidebar {
+            width: 140px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1000;
+            flex-shrink: 0;
+        }
+
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                rgba(106, 0, 255, 0.1) 0%, 
+                rgba(255, 0, 110, 0.1) 50%, 
+                rgba(0, 217, 255, 0.1) 100%);
+            pointer-events: none;
+        }
+
+        .logo {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6a00ff, #ff006e, #00d9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 1px;
+        }
+
+        .logo p {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 0.3rem;
+        }
+
+        .debug-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .debug-btn:hover {
+            background: rgba(106, 0, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .tabs {
+            flex: 1;
+            padding: 1rem 0;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tab {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 0.5rem;
+            margin: 0 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .tab:hover::before {
+            left: 100%;
+        }
+
+        .tab.active {
+            background: rgba(106, 0, 255, 0.2);
+            border-color: #6a00ff;
+            transform: translateX(5px);
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .tab-number {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a00ff, #ff006e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 15px rgba(106, 0, 255, 0.3);
+        }
+
+        .tab-info h3 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .tab-info p {
+            font-size: 0.6rem;
+            opacity: 0.7;
+            line-height: 1.3;
+        }
+
+        .tab.active .tab-number {
+            background: linear-gradient(135deg, #00d9ff, #6a00ff);
+            box-shadow: 0 6px 20px rgba(0, 217, 255, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #000000;
+            position: relative;
+        }
+
+        .content-header {
+            padding: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 10, 10, 0.8);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 100;
+        }
+
+        .current-sample {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sample-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6a00ff, #ff006e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(106, 0, 255, 0.3);
+        }
+
+        .sample-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .sample-description {
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-left: auto;
+        }
+
+        .control-btn {
+            padding: 0.7rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .iframe-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sample-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .sample-iframe.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #6a00ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .sample-info {
+            position: absolute;
+            bottom: 2rem;
+            left: 2rem;
+            right: 2rem;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .show-info .sample-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .debug-log {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            right: 2rem;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 50;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .show-debug .debug-log {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .log-content {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(106, 0, 255, 0.8);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(106, 0, 255, 1);
+            transform: scale(1.05);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .info-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .info-toggle:hover {
+            background: rgba(106, 0, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .tab {
+                padding: 1rem;
+                margin: 0 0.5rem;
+            }
+            
+            .tab-info h3 {
+                font-size: 1rem;
+            }
+            
+            .tab-info p {
+                font-size: 0.8rem;
+            }
+            
+            .controls {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>SAMPLES</h1>
+                <p>Website Collection</p>
+                <button class="debug-btn" id="saveLog">📝</button>
+                <a href="test-download.txt" download="test-download.txt" class="debug-btn" style="right: 3rem; background: linear-gradient(135deg, #ff006e, #ff4444);" title="テストファイルをダウンロード">⬇️</a>
+                <a href="simple-sync.html" class="debug-btn" style="right: 5.5rem; background: linear-gradient(135deg, #00d9ff, #6a00ff);" title="同期テストページ">🔥</a>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" data-sample="1">
+                    <div class="tab-number">1</div>
+                    <div class="tab-info">
+                        <h3>Creative Glass</h3>
+                        <p>グラスモーフィズムとパララックス効果</p>
+                    </div>
+                </div>
+                
+                <div class="tab" data-sample="2">
+                    <div class="tab-number">2</div>
+                    <div class="tab-info">
+                        <h3>Modern Clean</h3>
+                        <p>シンプルで洗練されたビジネス向けデザイン</p>
+                    </div>
+                </div>
+                
+                <div class="tab" data-sample="3">
+                    <div class="tab-number">3</div>
+                    <div class="tab-info">
+                        <h3>Ultra Cool</h3>
+                        <p>ネオンカラーと3Dアニメーション</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div class="current-sample">
+                    <div class="sample-badge">1</div>
+                    <div>
+                        <div class="sample-title">Creative Glass Design</div>
+                        <div class="sample-description">グラスモーフィズムとパララックス効果</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <a href="#" class="control-btn" id="openInNew">
+                        <span>🔗</span> 新しいタブで開く
+                    </a>
+                    <button class="control-btn" id="toggleInfo">
+                        <span>ℹ️</span> 詳細情報
+                    </button>
+                    <a href="mailto:?subject=美しいWebサイトサンプル集を公開しました！&body=3つの美しいWebサイトテンプレートを比較できるサンプル集を作成しました。%0A%0Aぜひご覧ください：%0Ahttps://muumuu8181.github.io/website-samples/%0A%0A【サンプル内容】%0A1. Modern Clean Design - シンプルで洗練されたビジネス向けデザイン%0A2. Creative Glass Design - グラスモーフィズムとパララックス効果%0A3. Ultra Cool Design - ネオンカラーと3Dアニメーション" class="control-btn">
+                        <span>✉️</span> メールで共有
+                    </a>
+                </div>
+            </div>
+
+            <div class="iframe-container">
+                <iframe class="sample-iframe active" id="iframe1" src="./sample2/all-in-one.html"></iframe>
+                <iframe class="sample-iframe" id="iframe2" src="./sample1/index.html"></iframe>
+                <iframe class="sample-iframe" id="iframe3" src="./sample3/index.html"></iframe>
+                
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="loading-spinner"></div>
+                </div>
+
+                <div class="sample-info" id="sampleInfo">
+                    <h3>サンプル1: Creative Glass Design</h3>
+                    <p><strong>特徴:</strong> グラスモーフィズム、パララックススクロール、カスタムカーソル</p>
+                    <p><strong>技術:</strong> CSS Backdrop-filter、JavaScript アニメーション、3D変形</p>
+                    <p><strong>用途:</strong> クリエイティブサイト、アート系ポートフォリオ、ブランディングサイト</p>
+                </div>
+
+                <!-- シンプルタスク機能 -->
+                <div class="simple-task-box" style="position: absolute; bottom: 20px; right: 20px; background: rgba(255,255,255,0.95); border-radius: 15px; padding: 20px; width: 300px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                    <h3 style="margin: 0 0 15px 0; color: #333;">🔥 同期タスク</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="taskInput" placeholder="タスクを入力..." style="flex: 1; padding: 8px 12px; border: 2px solid #ddd; border-radius: 8px;">
+                        <button onclick="addTask()" style="padding: 8px 20px; background: #6a00ff; color: white; border: none; border-radius: 8px; cursor: pointer;">追加</button>
+                    </div>
+                    <div id="taskList" style="max-height: 200px; overflow-y: auto;"></div>
+                    <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                        <span id="firebaseStatus">🔄 Firebase準備中...</span>
+                    </div>
+                </div>
+
+                <div class="debug-log" id="debugLog">
+                    <h3>デバッグログ</h3>
+                    <div class="log-content" id="logContent">
+                        <button class="copy-btn" id="copyBtn">コピー</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab');
+        const iframes = document.querySelectorAll('.sample-iframe');
+        const sampleBadge = document.querySelector('.sample-badge');
+        const sampleTitle = document.querySelector('.sample-title');
+        const sampleDescription = document.querySelector('.sample-description');
+        const sampleInfo = document.getElementById('sampleInfo');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const openInNewBtn = document.getElementById('openInNew');
+        const toggleInfoBtn = document.getElementById('toggleInfo');
+        const mainContent = document.querySelector('.main-content');
+        const saveLogBtn = document.getElementById('saveLog');
+        const logContent = document.getElementById('logContent');
+        const copyBtn = document.getElementById('copyBtn');
+
+        const samples = {
+            1: {
+                title: 'Creative Glass Design',
+                description: 'グラスモーフィズムとパララックス効果',
+                src: './sample2/all-in-one.html',
+                info: {
+                    title: 'サンプル1: Creative Glass Design',
+                    features: 'グラスモーフィズム、パララックススクロール、カスタムカーソル',
+                    tech: 'CSS Backdrop-filter、JavaScript アニメーション、3D変形',
+                    usage: 'クリエイティブサイト、アート系ポートフォリオ、ブランディングサイト'
+                }
+            },
+            2: {
+                title: 'Modern Clean Design',
+                description: 'シンプルで洗練されたビジネス向けデザイン',
+                src: './sample1/index.html',
+                info: {
+                    title: 'サンプル2: Modern Clean Design',
+                    features: 'シンプルで洗練されたレイアウト、ビジネス向けのクリーンなデザイン',
+                    tech: 'CSS Grid、Flexbox、スムーズなアニメーション',
+                    usage: 'コーポレートサイト、ポートフォリオ、ランディングページ'
+                }
+            },
+            3: {
+                title: 'Ultra Cool Design',
+                description: 'ネオンカラーと3Dアニメーション',
+                src: './sample3/index.html',
+                info: {
+                    title: 'サンプル3: Ultra Cool Design',
+                    features: 'グリッチエフェクト、3Dカード、インタラクティブパーティクル',
+                    tech: 'Canvas API、CSS 3D Transform、リアルタイムアニメーション',
+                    usage: 'ゲーミングサイト、テック系企業、先進的なブランド'
+                }
+            }
+        };
+
+        let currentSample = 1;
+        let showingInfo = false;
+        let showingDebug = false;
+        let debugLog = [];
+
+        // Debug logging function
+        function logDebug(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            debugLog.push(logEntry);
+            console.log(logEntry);
+            
+            // Update log display
+            if (logContent) {
+                const logText = debugLog.join('\n');
+                logContent.innerHTML = logText + '<button class="copy-btn" id="copyBtn">コピー</button>';
+                logContent.scrollTop = logContent.scrollHeight;
+                
+                // Re-attach copy button event
+                const newCopyBtn = document.getElementById('copyBtn');
+                if (newCopyBtn) {
+                    newCopyBtn.addEventListener('click', copyLogToClipboard);
+                }
+            }
+        }
+
+        // Copy log to clipboard
+        function copyLogToClipboard() {
+            const logText = debugLog.join('\n');
+            
+            // Create temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = logText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('ログをクリップボードにコピーしました！');
+            } catch (err) {
+                alert('コピーに失敗しました。手動で選択してコピーしてください:\n\n' + logText);
+            }
+            
+            document.body.removeChild(textarea);
+        }
+
+        // Save debug log to file
+        function saveDebugLog() {
+            const logContent = debugLog.join('\n');
+            
+            // Send log to local server to save as file
+            fetch('http://localhost:8000/save-log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ log: logContent })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('ログが debug_log.txt に保存されました');
+                } else {
+                    // Fallback: show in alert
+                    alert('Debug Log:\n\n' + logContent);
+                }
+            })
+            .catch(error => {
+                // Fallback: show in alert
+                alert('Debug Log:\n\n' + logContent);
+            });
+        }
+
+        function switchSample(sampleNum) {
+            logDebug(`Switching to sample ${sampleNum}`);
+            
+            // Validate sample number
+            if (!samples[sampleNum]) {
+                logDebug(`ERROR: Sample ${sampleNum} not found`);
+                return;
+            }
+            
+            // Show loading
+            loadingOverlay.classList.remove('hidden');
+            
+            // Hide all iframes
+            iframes.forEach((iframe, index) => {
+                iframe.classList.remove('active');
+                logDebug(`Iframe ${index + 1} hidden`);
+            });
+            
+            // Update tabs
+            tabs.forEach(tab => tab.classList.remove('active'));
+            if (tabs[sampleNum - 1]) {
+                tabs[sampleNum - 1].classList.add('active');
+                logDebug(`Tab ${sampleNum} activated`);
+            } else {
+                logDebug(`ERROR: Tab ${sampleNum} not found`);
+            }
+            
+            // Update header
+            const sample = samples[sampleNum];
+            sampleBadge.textContent = sampleNum;
+            sampleTitle.textContent = sample.title;
+            sampleDescription.textContent = sample.description;
+            
+            // Update info
+            sampleInfo.innerHTML = `
+                <h3>${sample.info.title}</h3>
+                <p><strong>特徴:</strong> ${sample.info.features}</p>
+                <p><strong>技術:</strong> ${sample.info.tech}</p>
+                <p><strong>用途:</strong> ${sample.info.usage}</p>
+            `;
+
+            currentSample = sampleNum;
+
+            // Force reload iframe and show
+            const targetIframe = iframes[sampleNum - 1];
+            if (!targetIframe) {
+                logDebug(`ERROR: Iframe ${sampleNum} not found`);
+                loadingOverlay.classList.add('hidden');
+                return;
+            }
+            
+            const newSrc = sample.src;
+            logDebug(`Loading iframe ${sampleNum} with src: ${newSrc}`);
+            
+            // Set source immediately and show iframe
+            targetIframe.src = newSrc;
+            targetIframe.classList.add('active');
+            logDebug(`Iframe ${sampleNum} set to active`);
+            logDebug(`Active iframe classes: ${targetIframe.className}`);
+            
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+                logDebug(`Sample ${sampleNum} loaded successfully`);
+                logDebug(`Final iframe ${sampleNum} classes: ${targetIframe.className}`);
+            }, 500);
+        }
+
+        // Tab click events
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                logDebug(`Tab ${index + 1} clicked`);
+                switchSample(index + 1);
+            });
+        });
+
+        // Open in new tab
+        openInNewBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.open(samples[currentSample].src, '_blank');
+        });
+
+        // Toggle info
+        toggleInfoBtn.addEventListener('click', () => {
+            showingInfo = !showingInfo;
+            if (showingInfo) {
+                mainContent.classList.add('show-info');
+                toggleInfoBtn.innerHTML = '<span>❌</span> 閉じる';
+            } else {
+                mainContent.classList.remove('show-info');
+                toggleInfoBtn.innerHTML = '<span>ℹ️</span> 詳細情報';
+            }
+        });
+
+        // Save log (now toggles debug display)
+        saveLogBtn.addEventListener('click', () => {
+            showingDebug = !showingDebug;
+            if (showingDebug) {
+                mainContent.classList.add('show-debug');
+                logDebug('Debug log display opened');
+            } else {
+                mainContent.classList.remove('show-debug');
+                logDebug('Debug log display closed');
+            }
+        });
+
+        // Initialize copy button
+        if (copyBtn) {
+            copyBtn.addEventListener('click', copyLogToClipboard);
+        }
+
+        // Hide loading after initial load
+        window.addEventListener('load', () => {
+            logDebug('Page loaded');
+            logDebug(`Found ${tabs.length} tabs`);
+            logDebug(`Found ${iframes.length} iframes`);
+            tabs.forEach((tab, index) => {
+                logDebug(`Tab ${index + 1}: ${tab.dataset.sample}`);
+            });
+            setTimeout(() => {
+                loadingOverlay.classList.add('hidden');
+                logDebug('Initial loading complete');
+            }, 1000);
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '1' && e.key <= '3') {
+                switchSample(parseInt(e.key));
+            }
+        });
+
+        // Add iframe load event listeners
+        iframes.forEach((iframe, index) => {
+            iframe.addEventListener('load', () => {
+                console.log(`Iframe ${index + 1} loaded successfully`);
+            });
+            
+            iframe.addEventListener('error', () => {
+                console.error(`Iframe ${index + 1} failed to load`);
+            });
+        });
+    </script>
