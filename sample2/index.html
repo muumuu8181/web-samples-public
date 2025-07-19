@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Design - Sample 2</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Cursor Animation -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Loading Screen -->
+    <div class="loader">
+        <div class="loader-content">
+            <h2 class="loader-text">Loading Experience</h2>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-text">CREATIVE</span>
+            </div>
+            <div class="nav-links">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#work" class="nav-link">Work</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Parallax -->
+    <section id="home" class="hero">
+        <div class="hero-bg" data-speed="0.5"></div>
+        <div class="floating-shapes">
+            <div class="shape shape-1" data-speed="0.2"></div>
+            <div class="shape shape-2" data-speed="0.3"></div>
+            <div class="shape shape-3" data-speed="0.4"></div>
+        </div>
+        <div class="hero-content" data-speed="0.8">
+            <h1 class="hero-title">
+                <span class="title-word">Design</span>
+                <span class="title-word">Beyond</span>
+                <span class="title-word">Limits</span>
+            </h1>
+            <p class="hero-subtitle">Experience the future of web design</p>
+            <button class="cta-button">
+                <span>Explore</span>
+                <div class="button-bg"></div>
+            </button>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section with Glass Cards -->
+    <section id="about" class="about">
+        <div class="container">
+            <h2 class="section-title" data-aos="fade-up">
+                <span class="title-bg">About</span>
+                What We Do
+            </h2>
+            <div class="glass-grid">
+                <div class="glass-card" data-tilt>
+                    <div class="card-icon">✨</div>
+                    <h3>Innovation</h3>
+                    <p>Pushing boundaries with cutting-edge design solutions</p>
+                </div>
+                <div class="glass-card" data-tilt>
+                    <div class="card-icon">🎨</div>
+                    <h3>Creativity</h3>
+                    <p>Transforming ideas into visual masterpieces</p>
+                </div>
+                <div class="glass-card" data-tilt>
+                    <div class="card-icon">🚀</div>
+                    <h3>Performance</h3>
+                    <p>Lightning-fast experiences that captivate users</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Work Section with 3D Cards -->
+    <section id="work" class="work">
+        <div class="container">
+            <h2 class="section-title">Featured Work</h2>
+            <div class="work-grid">
+                <div class="work-item">
+                    <div class="work-image">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="work-info">
+                        <h3>Project Alpha</h3>
+                        <p>Digital Experience</p>
+                    </div>
+                </div>
+                <div class="work-item">
+                    <div class="work-image">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="work-info">
+                        <h3>Project Beta</h3>
+                        <p>Brand Identity</p>
+                    </div>
+                </div>
+                <div class="work-item">
+                    <div class="work-image">
+                        <div class="image-overlay"></div>
+                    </div>
+                    <div class="work-info">
+                        <h3>Project Gamma</h3>
+                        <p>Web Application</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Section -->
+    <section class="interactive">
+        <div class="container">
+            <div class="interactive-content">
+                <h2 class="glitch" data-text="INTERACTIVE">INTERACTIVE</h2>
+                <p class="typewriter">Creating experiences that matter.</p>
+            </div>
+            <canvas id="particle-canvas"></canvas>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Let's Connect</h2>
+            <div class="contact-content">
+                <div class="contact-form glass-card">
+                    <input type="text" placeholder="Your Name" class="form-input">
+                    <input type="email" placeholder="Your Email" class="form-input">
+                    <textarea placeholder="Your Message" class="form-textarea"></textarea>
+                    <button class="submit-button">Send Message</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Creative Design. Crafted with passion.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
