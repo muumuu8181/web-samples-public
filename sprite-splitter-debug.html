@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprite Splitter Debug - 問題診断版</title>
+    <title>Sprite Splitter Debug - 完全版</title>
     <style>
         body {
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             background: #0a0a0a;
             color: #00ff00;
             padding: 20px;
@@ -43,9 +43,26 @@
             cursor: pointer;
             border-radius: 5px;
             margin: 5px;
+            transition: all 0.3s;
         }
         .btn:hover {
             background: #555;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background: #006600;
+            border-color: #00ff00;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: #008800;
+        }
+        .btn-danger {
+            background: #660000;
+            border-color: #ff0000;
+            color: #ff6666;
         }
         #log {
             background: #000;
@@ -55,16 +72,105 @@
             overflow-y: auto;
             border: 1px solid #333;
             font-size: 12px;
+            font-family: monospace;
         }
         .preview img {
             max-width: 300px;
             max-height: 300px;
             border: 1px solid #555;
+            image-rendering: pixelated;
+        }
+        .settings {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .form-group {
+            margin: 10px 0;
+        }
+        .form-group label {
+            display: block;
+            color: #00cccc;
+            margin-bottom: 5px;
+        }
+        input[type="number"], input[type="color"], input[type="text"] {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 8px 16px;
+            background: #333;
+            border: 1px solid #555;
+            color: #ccc;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .tab.active {
+            background: #006600;
+            color: #fff;
+            border-color: #00ff00;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .results {
+            display: none;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .sprite-item {
+            background: #333;
+            border: 1px solid #555;
+            padding: 8px;
+            text-align: center;
+            border-radius: 3px;
+        }
+        .sprite-item img {
+            width: 100%;
+            image-rendering: pixelated;
+            margin-bottom: 5px;
+        }
+        .sprite-item p {
+            font-size: 10px;
+            color: #ccc;
+            margin: 5px 0;
+            word-break: break-all;
+        }
+        .status {
+            color: #ffff00;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <h1>🔍 Sprite Splitter Debug Version</h1>
+    <h1>🔍 Sprite Splitter Debug - 完全版</h1>
     
     <div class="debug-info">
         <h3>ブラウザ情報</h3>
@@ -77,21 +183,65 @@
     </div>
 
     <div class="upload-area" id="uploadArea">
-        <p>📂 テスト: 画像をクリックまたはドラッグ&ドロップ</p>
+        <p>📂 画像をクリックまたはドラッグ&ドロップ</p>
         <input type="file" id="fileInput" accept="image/*">
-        <button class="btn" onclick="document.getElementById('fileInput').click()">ファイル選択ボタン</button>
-    </div>
-
-    <div class="debug-info">
-        <h3>テスト用画像を作成</h3>
-        <button class="btn" onclick="createTestImage()">テスト画像を生成</button>
-        <div id="testImageArea"></div>
+        <button class="btn" onclick="document.getElementById('fileInput').click()">ファイル選択</button>
+        <button class="btn" onclick="createTestImage()">テスト画像生成</button>
     </div>
 
     <div class="preview" id="preview" style="display:none;">
         <h3>プレビュー</h3>
         <img id="previewImg" alt="Preview">
         <p id="imageInfo"></p>
+        <button class="btn btn-danger" onclick="clearImage()">画像クリア</button>
+    </div>
+
+    <div class="settings" id="settings" style="display:none;">
+        <h3>分割設定</h3>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('grid')">黒枠検出</div>
+            <div class="tab" onclick="switchTab('fixed')">固定サイズ</div>
+        </div>
+        
+        <div class="tab-content active" id="grid-tab">
+            <div class="form-group">
+                <label>区切り線の色</label>
+                <input type="color" id="separatorColor" value="#000000">
+            </div>
+        </div>
+        
+        <div class="tab-content" id="fixed-tab">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>横幅 (px)</label>
+                    <input type="number" id="tileWidth" value="50" min="1">
+                </div>
+                <div class="form-group">
+                    <label>縦幅 (px)</label>
+                    <input type="number" id="tileHeight" value="50" min="1">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>間隔 (px)</label>
+                <input type="number" id="padding" value="2" min="0">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>ファイル名プレフィックス</label>
+            <input type="text" id="baseName" value="sprite">
+        </div>
+
+        <button class="btn btn-primary" onclick="processImage()" id="processBtn">
+            🔪 分割開始
+        </button>
+    </div>
+
+    <div class="results" id="results">
+        <h3>分割結果: <span id="spriteCount" class="status">0</span>個</h3>
+        <button class="btn btn-primary" onclick="downloadAll()">📦 すべてダウンロード</button>
+        <div class="results-grid" id="resultsGrid"></div>
     </div>
 
     <div class="debug-info">
@@ -102,6 +252,9 @@
 
     <script>
         let log = document.getElementById('log');
+        let currentImage = null;
+        let sprites = [];
+        let activeTab = 'grid';
         
         function addLog(message) {
             const time = new Date().toLocaleTimeString();
@@ -138,8 +291,8 @@
         const fileInput = document.getElementById('fileInput');
 
         uploadArea.addEventListener('click', (e) => {
-            addLog('アップロードエリアクリック');
             if (e.target === uploadArea) {
+                addLog('アップロードエリアクリック');
                 fileInput.click();
             }
         });
@@ -155,13 +308,11 @@
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.classList.add('dragging');
-            addLog('ドラッグオーバー');
         });
 
         uploadArea.addEventListener('dragleave', (e) => {
             e.preventDefault();
             uploadArea.classList.remove('dragging');
-            addLog('ドラッグリーブ');
         });
 
         uploadArea.addEventListener('drop', (e) => {
@@ -203,27 +354,230 @@
             const preview = document.getElementById('preview');
             const img = document.getElementById('previewImg');
             const info = document.getElementById('imageInfo');
+            const settings = document.getElementById('settings');
             
-            img.onload = () => {
-                addLog(`✅ 画像表示成功: ${img.naturalWidth}x${img.naturalHeight}`);
+            currentImage = new Image();
+            currentImage.onload = () => {
+                addLog(`✅ 画像表示成功: ${currentImage.naturalWidth}x${currentImage.naturalHeight}`);
                 info.innerHTML = `
                     <strong>ファイル名:</strong> ${file.name}<br>
-                    <strong>サイズ:</strong> ${img.naturalWidth} x ${img.naturalHeight}<br>
+                    <strong>サイズ:</strong> ${currentImage.naturalWidth} x ${currentImage.naturalHeight}<br>
                     <strong>ファイルサイズ:</strong> ${file.size} bytes<br>
                     <strong>タイプ:</strong> ${file.type}
                 `;
+                
+                // Show settings panel
+                settings.style.display = 'block';
+                addLog('🔧 設定パネル表示');
             };
             
-            img.onerror = () => {
+            currentImage.onerror = () => {
                 addLog('❌ 画像表示エラー');
             };
             
-            img.src = dataUrl;
+            img.src = currentImage.src = dataUrl;
             preview.style.display = 'block';
         }
 
+        function clearImage() {
+            addLog('🗑️ 画像クリア');
+            currentImage = null;
+            sprites = [];
+            document.getElementById('preview').style.display = 'none';
+            document.getElementById('settings').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+            fileInput.value = '';
+        }
+
+        function switchTab(tab) {
+            activeTab = tab;
+            addLog(`🔄 タブ切り替え: ${tab}`);
+            
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.textContent.includes(tab === 'grid' ? '黒枠' : '固定'));
+            });
+            document.getElementById('grid-tab').classList.toggle('active', tab === 'grid');
+            document.getElementById('fixed-tab').classList.toggle('active', tab === 'fixed');
+        }
+
+        function processImage() {
+            if (!currentImage) {
+                addLog('❌ 画像が選択されていません');
+                return;
+            }
+
+            addLog('🔪 画像分割開始');
+            sprites = [];
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = currentImage.naturalWidth;
+            canvas.height = currentImage.naturalHeight;
+            ctx.drawImage(currentImage, 0, 0);
+            
+            addLog(`📐 キャンバス作成: ${canvas.width}x${canvas.height}`);
+
+            if (activeTab === 'grid') {
+                addLog('🔍 黒枠検出モードで処理中...');
+                processGridSplit(canvas, ctx);
+            } else {
+                addLog('📏 固定サイズモードで処理中...');
+                processFixedSplit(canvas, ctx);
+            }
+
+            displayResults();
+        }
+
+        function processFixedSplit(canvas, ctx) {
+            const tileWidth = parseInt(document.getElementById('tileWidth').value);
+            const tileHeight = parseInt(document.getElementById('tileHeight').value);
+            const padding = parseInt(document.getElementById('padding').value);
+            
+            addLog(`⚙️ 設定: ${tileWidth}x${tileHeight}px, 間隔${padding}px`);
+
+            let count = 0;
+            let y = 0;
+            while (y + tileHeight <= canvas.height) {
+                let x = 0;
+                while (x + tileWidth <= canvas.width) {
+                    const spriteCanvas = document.createElement('canvas');
+                    const spriteCtx = spriteCanvas.getContext('2d');
+                    spriteCanvas.width = tileWidth;
+                    spriteCanvas.height = tileHeight;
+                    spriteCtx.drawImage(canvas, x, y, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
+                    sprites.push(spriteCanvas);
+                    count++;
+                    x += tileWidth + padding;
+                }
+                y += tileHeight + padding;
+            }
+            addLog(`✅ 固定サイズ分割完了: ${count}個`);
+        }
+
+        function processGridSplit(canvas, ctx) {
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const color = hexToRgb(document.getElementById('separatorColor').value);
+            
+            addLog(`🎨 区切り色: RGB(${color.r}, ${color.g}, ${color.b})`);
+            
+            const hLines = findLines(imageData, color, true);
+            const vLines = findLines(imageData, color, false);
+            
+            addLog(`📏 検出: 横線${hLines.length}本, 縦線${vLines.length}本`);
+
+            let count = 0;
+            for (let i = 0; i < hLines.length - 1; i++) {
+                for (let j = 0; j < vLines.length - 1; j++) {
+                    const x = vLines[j] + 1;
+                    const y = hLines[i] + 1;
+                    const width = vLines[j + 1] - vLines[j] - 1;
+                    const height = hLines[i + 1] - hLines[i] - 1;
+
+                    if (width > 2 && height > 2) {
+                        const spriteCanvas = document.createElement('canvas');
+                        const spriteCtx = spriteCanvas.getContext('2d');
+                        spriteCanvas.width = width;
+                        spriteCanvas.height = height;
+                        spriteCtx.drawImage(canvas, x, y, width, height, 0, 0, width, height);
+                        sprites.push(spriteCanvas);
+                        count++;
+                    }
+                }
+            }
+            addLog(`✅ 黒枠検出分割完了: ${count}個`);
+        }
+
+        function findLines(imageData, color, horizontal) {
+            const lines = [0];
+            const limit = horizontal ? imageData.height : imageData.width;
+            const crossLimit = horizontal ? imageData.width : imageData.height;
+
+            for (let i = 1; i < limit - 1; i++) {
+                let isLine = true;
+                for (let j = 0; j < crossLimit; j++) {
+                    const x = horizontal ? j : i;
+                    const y = horizontal ? i : j;
+                    const idx = (y * imageData.width + x) * 4;
+                    if (imageData.data[idx] !== color.r || 
+                        imageData.data[idx + 1] !== color.g || 
+                        imageData.data[idx + 2] !== color.b) {
+                        isLine = false;
+                        break;
+                    }
+                }
+                if (isLine) {
+                    lines.push(i);
+                }
+            }
+
+            if (lines[lines.length - 1] !== limit - 1) {
+                lines.push(limit - 1);
+            }
+            return lines;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {r: 0, g: 0, b: 0};
+        }
+
+        function displayResults() {
+            const results = document.getElementById('results');
+            const grid = document.getElementById('resultsGrid');
+            const count = document.getElementById('spriteCount');
+            
+            results.style.display = 'block';
+            count.textContent = sprites.length;
+            grid.innerHTML = '';
+            
+            addLog(`📊 結果表示: ${sprites.length}個のスプライト`);
+
+            sprites.forEach((sprite, index) => {
+                const item = document.createElement('div');
+                item.className = 'sprite-item';
+
+                const img = document.createElement('img');
+                img.src = sprite.toDataURL();
+
+                const name = document.createElement('p');
+                const baseName = document.getElementById('baseName').value;
+                name.textContent = `${baseName}_${String(index).padStart(4, '0')}.png`;
+
+                const btn = document.createElement('button');
+                btn.className = 'btn';
+                btn.textContent = 'DL';
+                btn.onclick = () => downloadSprite(sprite, index);
+
+                item.appendChild(img);
+                item.appendChild(name);
+                item.appendChild(btn);
+                grid.appendChild(item);
+            });
+        }
+
+        function downloadSprite(canvas, index) {
+            const link = document.createElement('a');
+            const baseName = document.getElementById('baseName').value;
+            const filename = `${baseName}_${String(index).padStart(4, '0')}.png`;
+            link.download = filename;
+            link.href = canvas.toDataURL();
+            link.click();
+            addLog(`📥 ダウンロード: ${filename}`);
+        }
+
+        function downloadAll() {
+            addLog(`📦 一括ダウンロード開始: ${sprites.length}個`);
+            sprites.forEach((sprite, index) => {
+                setTimeout(() => downloadSprite(sprite, index), index * 50);
+            });
+        }
+
         function createTestImage() {
-            addLog('テスト画像生成開始');
+            addLog('🎨 テスト画像生成開始');
             
             const canvas = document.createElement('canvas');
             canvas.width = 200;
@@ -262,6 +616,13 @@
                 for (let x = 0; x < 4; x++) {
                     ctx.fillStyle = colors[colorIndex % colors.length];
                     ctx.fillRect(x * 50 + 10, y * 50 + 10, 30, 30);
+                    
+                    // Add number
+                    ctx.fillStyle = 'white';
+                    ctx.font = '12px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(colorIndex + 1, x * 50 + 25, y * 50 + 30);
+                    
                     colorIndex++;
                 }
             }
