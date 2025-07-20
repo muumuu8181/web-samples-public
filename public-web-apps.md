@@ -26,6 +26,16 @@
 - Firebase リアルタイム同期対応
 - デバッグログ機能
 
+### 4. 汎用Webアプリテンプレート 🆕
+🔗 **https://muumuu8181.github.io/web-samples-public/webapp-template.html**
+
+- 📝タスク・📔ノート・👥会議・🎯目標管理
+- Firebase認証・リアルタイム同期
+- Google OAuth・ゲスト・デモモード対応
+- ドラッグ&ドロップ・デバッグログ完備
+- プロダクションレディなテンプレート
+- [詳細ドキュメント](./WEBAPP_TEMPLATE_README.md)
+
 ## 🚀 アクセス方法
 
 1. **アプリ一覧から**: https://muumuu8181.github.io/web-samples-public/
