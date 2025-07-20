@@ -1,153 +1,65 @@
-# 🌐 Web Samples Public
+# 🌟 Web Samples Collection
 
-Webアプリケーション開発のための包括的なサンプル・テンプレート集です。
+3つの美しいWebサイトテンプレートを比較・試用できるサンプル集です。
 
-## 📋 リポジトリ概要
+## 🎯 サンプル紹介
 
-このリポジトリは、Webアプリケーション開発に必要な様々なリソースを体系的に整理しています：
+### Sample 1: Modern Clean Design
+- **特徴**: シンプルで洗練されたビジネス向けデザイン
+- **技術**: CSS Grid、Flexbox、スムーズなアニメーション
+- **用途**: コーポレートサイト、ポートフォリオ、ランディングページ
 
-- **30種類以上のテンプレートタイプ** - あらゆる用途に対応
-- **実用的なサンプルアプリ** - すぐに使える実装例
-- **美しいデザインサンプル** - 参考になるUI/UX
-- **便利な開発ツール** - 作業効率を向上
+### Sample 2: Creative Glass Design
+- **特徴**: グラスモーフィズム、パララックススクロール、カスタムカーソル
+- **技術**: CSS Backdrop-filter、JavaScript アニメーション、3D変形
+- **用途**: クリエイティブサイト、アート系ポートフォリオ、ブランディングサイト
 
-## 🗂️ コンテンツ構成
-
-### 📐 Sample Types（テンプレートタイプ集）
-- **30種類のテンプレートタイプ一覧** - 基本から特殊用途まで網羅
-- **汎用Webアプリテンプレート** - Firebase認証・リアルタイム同期対応
-- カテゴリー：基本、自己管理、便利サービス、ゲーム、AIエージェント、特殊用途
-
-### 🎨 Sample Sites（デザインサンプル）
-- **3つのデザインパターン** - タブで切り替えて比較可能
-- **Modern Clean Design** - シンプルで洗練されたビジネス向け
-- **Creative Glass Design** - グラスモーフィズムとパララックス効果
-- **Ultra Cool Design** - グリッチエフェクトと3Dアニメーション
-
-### 📱 Sample Apps（実用アプリケーション）
-- **Firebase同期タスクアプリ** - リアルタイム同期・マルチデバイス対応
-- **ダイエット記録アプリ** - 食事記録・カロリー計算・グラフ表示
-
-### 🛠️ Sample Tools（開発ツール）
-- **Sprite Splitter** - スプライト画像を個別画像に分割
-- **Sprite Splitter (Debug)** - デバッグモード付きバージョン
+### Sample 3: Ultra Cool Design
+- **特徴**: グリッチエフェクト、3Dカード、インタラクティブパーティクル
+- **技術**: Canvas API、CSS 3D Transform、リアルタイムアニメーション
+- **用途**: ゲーミングサイト、テック系企業、先進的なブランド
 
 ## 🚀 使い方
 
-### オンラインで確認
-1. **メインページ**: https://muumuu8181.github.io/web-samples-public/
-2. 各カテゴリーから興味のあるサンプルを選択
-3. ブラウザで直接動作を確認
+1. 左側のタブをクリックしてサンプルを切り替え
+2. 各サンプルの特徴を比較
+3. 気に入ったデザインを参考に開発
 
-### ローカルで使用
-```bash
-# リポジトリをクローン
-git clone https://github.com/muumuu8181/web-samples-public.git
+## 🌐 ライブデモ
 
-# ディレクトリに移動
-cd web-samples-public
+- **アプリ一覧**: https://muumuu8181.github.io/web-samples-public/
+- **サンプルページ**: https://muumuu8181.github.io/web-samples-public/samples.html
+- **同期タスク**: https://muumuu8181.github.io/web-samples-public/simple-sync.html
+- **汎用Webアプリテンプレート**: https://muumuu8181.github.io/web-samples-public/webapp-template.html
 
-# ローカルサーバーで起動（例：Python）
-python -m http.server 8000
-# または
-npx http-server
-```
+## 🚀 新機能: Webアプリテンプレート
 
-## 🌟 主な特徴
-
-### 統合されたナビゲーション
-- すべてのコンテンツに簡単アクセス
-- カテゴリー別の整理
-- 統計情報の表示
-
-### 実用性重視
-- プロダクションレディなテンプレート
-- 実際に動作するサンプルアプリ
-- すぐに開発に使える構成
-
-### 最新技術対応
-- Firebase認証・リアルタイム同期
-- PWA対応
-- レスポンシブデザイン
-- ダークモード対応
-
-## 📁 ディレクトリ構造
-
-```
-web-samples-public/
-├── index.html          # メインナビゲーション
-├── sample-sites/       # デザインサンプル集
-│   ├── index.html      # タブ切替ビューア
-│   ├── site1/          # Modern Clean
-│   ├── site2/          # Creative Glass
-│   └── site3/          # Ultra Cool
-├── sample-types/       # テンプレートタイプ集
-│   ├── types-30.html   # 30種類一覧
-│   └── webapp-basic.html # 基本テンプレート
-├── sample-apps/        # 実用アプリ
-│   └── simple-sync.html # 同期タスクアプリ
-└── sample-tools/       # 開発ツール
-    ├── sprite-splitter.html
-    └── sprite-splitter-debug.html
-```
-
-## 🎯 活用例
-
-### スタートアップ向け
-1. `sample-types/types-30.html`から適切なテンプレートを選択
-2. 必要な機能を組み合わせてカスタマイズ
-3. Firebase設定を追加して即座にデプロイ
-
-### 学習目的
-1. 各サンプルのソースコードを確認
-2. 実装パターンを学習
-3. 自分のプロジェクトに応用
-
-### プロトタイピング
-1. デザインサンプルを参考にUI設計
-2. テンプレートを使って素早く実装
-3. 実用アプリを参考に機能追加
-
-## 🔧 技術スタック
-
-- **フロントエンド**: HTML5, CSS3, JavaScript (ES6+)
-- **スタイリング**: CSS Grid, Flexbox, CSS Variables
-- **アニメーション**: CSS Animations, Web Animations API
-- **バックエンド**: Firebase (Authentication, Realtime Database)
-- **その他**: Canvas API, WebGL, Service Worker
+### Firebase完全対応の汎用テンプレート
+- **Google認証・リアルタイム同期・デバッグログ**を完備
+- **プロダクションレディ**で即座に利用可能
+- **タスク・ノート・会議・目標管理**に対応
+- 詳細: [WEBAPP_TEMPLATE_README.md](./WEBAPP_TEMPLATE_README.md)
+- 🔐 **Google認証設定ガイド**: [GOOGLE_AUTH_SETUP_GUIDE.md](./GOOGLE_AUTH_SETUP_GUIDE.md)
 
 ## 📱 対応環境
 
-- ✅ デスクトップブラウザ（Chrome, Firefox, Safari, Edge）
-- ✅ モバイルブラウザ（iOS Safari, Chrome for Android）
-- ✅ タブレット対応
-- ✅ PWA対応（オフライン動作可能）
+- ✅ デスクトップ
+- ✅ タブレット
+- ✅ スマートフォン
+- ✅ 全モダンブラウザ
 
-## 🤝 貢献方法
+## 🛠️ 技術スタック
 
-1. このリポジトリをフォーク
-2. 新しいブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add amazing feature'`)
-4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-5. プルリクエストを作成
+- HTML5
+- CSS3 (Flexbox, Grid, Backdrop-filter)
+- JavaScript (ES6+)
+- Canvas API
+- CSS Animations
 
 ## 📄 ライセンス
 
-MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照してください。
-
-商用・非商用問わず自由にご利用いただけます。
-
-## 🙏 謝辞
-
-- Firebase チーム - 素晴らしいバックエンドサービス
-- オープンソースコミュニティ - インスピレーションとサポート
-- すべての貢献者の皆様
-
-## 📞 お問い合わせ
-
-- **GitHub Issues**: [問題報告・機能要望](https://github.com/muumuu8181/web-samples-public/issues)
-- **GitHub Discussions**: [質問・議論](https://github.com/muumuu8181/web-samples-public/discussions)
+MIT License - 自由にご利用ください。
 
 ---
 
-**最終更新**: 2025-07-20 | Created with ❤️ by Claude Code
+Created with ❤️ by Claude Code
