@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webアプリテンプレート ショーケース</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .header {
+            background-color: #2196F3;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tabs-container {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .tabs {
+            display: flex;
+            padding: 0 20px;
+            min-width: max-content;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: #2196F3;
+        }
+
+        .tab.active {
+            color: #2196F3;
+            border-bottom-color: #2196F3;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .template-view {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+
+        .template-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 共通コンポーネントスタイル */
+        .demo-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .demo-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .demo-button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .demo-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .demo-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .demo-list-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .demo-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        /* インデックススタイル */
+        .index-container {
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .index-container h3 {
+            color: #2196F3;
+            margin-bottom: 15px;
+        }
+
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .index-item {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .index-item:hover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .index-item-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .index-item-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .template-section {
+            scroll-margin-top: 80px;
+            margin-bottom: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .template-section:first-child {
+            border-top: none;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .tabs {
+                padding: 0 10px;
+            }
+            .tab {
+                padding: 12px 15px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚀 Webアプリテンプレート ショーケース</h1>
+        <p>30種類のテンプレートプレビュー</p>
+    </div>
+
+    <!-- インデックスナビゲーション -->
+    <div class="index-container" id="indexContainer">
+        <h3>📋 クイックアクセス</h3>
+        <div class="index-grid" id="indexGrid">
+            <!-- インデックスは動的に生成 -->
+        </div>
+    </div>
+
+    <div class="tabs-container">
+        <div class="tabs" id="tabsContainer">
+            <!-- タブは動的に生成 -->
+        </div>
+    </div>
+
+    <div class="content" id="contentContainer">
+        <!-- コンテンツは動的に生成 -->
+    </div>
+
+    <script>
+        // テンプレートデータ
+        const templates = [
+            // 基本テンプレート
+            {
+                id: 'auth',
+                name: '認証基本',
+                category: '基本',
+                icon: '🔐',
+                content: `
+                    <div class="demo-container">
+                        <div style="max-width: 400px; margin: 0 auto; text-align: center;">
+                            <h2 style="margin-bottom: 30px;">ログイン</h2>
+                            <input type="email" class="demo-input" placeholder="メールアドレス">
+                            <input type="password" class="demo-input" placeholder="パスワード">
+                            <button class="demo-button" style="width: 100%;">ログイン</button>
+                            <div style="margin: 20px 0;">または</div>
+                            <button class="demo-button" style="width: 100%; background: #4285f4;">
+                                <span>🔷</span> Googleでログイン
+                            </button>
+                            <button class="demo-button" style="width: 100%; background: #28a745; margin-top: 10px;">
+                                ゲストとして利用
+                            </button>
+                            <p style="margin-top: 20px; color: #666;">
+                                アカウントをお持ちでない方は
+                                <a href="#" style="color: #2196F3;">新規登録</a>
+                            </p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'dashboard',
+                name: 'ダッシュボード',
+                category: '基本',
+                icon: '📊',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>ダッシュボード</h2>
+                            <p>2024年1月の概要</p>
+                        </div>
+                        <div class="demo-grid">
+                            <div class="demo-card">
+                                <h3>📈 売上</h3>
+                                <p style="font-size: 24px; font-weight: bold;">¥1,234,567</p>
+                                <p style="color: #4CAF50;">+12.5% 前月比</p>
+                            </div>
+                            <div class="demo-card">
+                                <h3>👥 ユーザー数</h3>
+                                <p style="font-size: 24px; font-weight: bold;">8,932</p>
+                                <p style="color: #4CAF50;">+234 新規</p>
+                            </div>
+                            <div class="demo-card">
+                                <h3>📊 コンバージョン率</h3>
+                                <p style="font-size: 24px; font-weight: bold;">3.4%</p>
+                                <p style="color: #f44336;">-0.2% 前月比</p>
+                            </div>
+                            <div class="demo-card">
+                                <h3>⏱️ 平均滞在時間</h3>
+                                <p style="font-size: 24px; font-weight: bold;">5:23</p>
+                                <p style="color: #4CAF50;">+0:45 前月比</p>
+                            </div>
+                        </div>
+                        <div class="demo-card" style="margin-top: 20px;">
+                            <h3>📊 グラフエリア</h3>
+                            <div style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999;">
+                                [グラフ表示エリア]
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'list',
+                name: 'リスト管理',
+                category: '基本',
+                icon: '📋',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h2>タスクリスト</h2>
+                            <button class="demo-button">+ 新規追加</button>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <input type="search" class="demo-input" placeholder="検索...">
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <select class="demo-input" style="width: auto;">
+                                    <option>すべて</option>
+                                    <option>未完了</option>
+                                    <option>完了</option>
+                                </select>
+                                <select class="demo-input" style="width: auto;">
+                                    <option>優先度順</option>
+                                    <option>期限順</option>
+                                    <option>作成日順</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="demo-list-item">
+                                <div>
+                                    <input type="checkbox"> 
+                                    <span>プレゼン資料の作成</span>
+                                    <span class="demo-badge" style="background: #f44336; margin-left: 10px;">高</span>
+                                </div>
+                                <span style="color: #666;">期限: 1/25</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <div>
+                                    <input type="checkbox" checked> 
+                                    <span style="text-decoration: line-through; color: #999;">会議の準備</span>
+                                </div>
+                                <span style="color: #666;">完了</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <div>
+                                    <input type="checkbox"> 
+                                    <span>メール返信</span>
+                                    <span class="demo-badge" style="background: #FF9800; margin-left: 10px;">中</span>
+                                </div>
+                                <span style="color: #666;">期限: 1/26</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'form',
+                name: 'フォーム入力',
+                category: '基本',
+                icon: '📝',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>お問い合わせフォーム</h2>
+                            <p>必要事項をご記入ください</p>
+                        </div>
+                        <form>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">お名前 *</label>
+                                <input type="text" class="demo-input" placeholder="山田 太郎" required>
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">メールアドレス *</label>
+                                <input type="email" class="demo-input" placeholder="example@email.com" required>
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">お問い合わせ種別</label>
+                                <select class="demo-input">
+                                    <option>選択してください</option>
+                                    <option>製品について</option>
+                                    <option>サポート</option>
+                                    <option>その他</option>
+                                </select>
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">お問い合わせ内容 *</label>
+                                <textarea class="demo-input" rows="5" placeholder="お問い合わせ内容をご記入ください" required></textarea>
+                            </div>
+                            <div style="margin-bottom: 20px;">
+                                <label>
+                                    <input type="checkbox"> 
+                                    プライバシーポリシーに同意する
+                                </label>
+                            </div>
+                            <button type="submit" class="demo-button">送信する</button>
+                        </form>
+                    </div>
+                `
+            },
+            {
+                id: 'calendar',
+                name: 'カレンダー',
+                category: '基本',
+                icon: '📅',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h2>2024年1月</h2>
+                            <div>
+                                <button class="demo-button">＜ 前月</button>
+                                <button class="demo-button">今日</button>
+                                <button class="demo-button">次月 ＞</button>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: #ddd; border: 1px solid #ddd;">
+                            <div style="background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold;">日</div>
+                            <div style="background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold;">月</div>
+                            <div style="background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold;">火</div>
+                            <div style="background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold;">水</div>
+                            <div style="background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold;">木</div>
+                            <div style="background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold;">金</div>
+                            <div style="background: #f8f9fa; padding: 10px; text-align: center; font-weight: bold;">土</div>
+                            ${Array(35).fill(0).map((_, i) => {
+                                const day = i - 6;
+                                if (day < 1 || day > 31) return '<div style="background: white; padding: 20px;"></div>';
+                                const hasEvent = [5, 12, 15, 23].includes(day);
+                                return `
+                                    <div style="background: white; padding: 10px; min-height: 80px;">
+                                        <div>${day}</div>
+                                        ${hasEvent ? '<div style="background: #2196F3; color: white; padding: 2px 5px; border-radius: 3px; font-size: 12px; margin-top: 5px;">予定あり</div>' : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `
+            },
+
+            // 自己管理系
+            {
+                id: 'habit',
+                name: '習慣トラッカー',
+                category: '自己管理',
+                icon: '📊',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>習慣トラッカー</h2>
+                            <p>今月の達成率: 78%</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>🏃 運動する</h3>
+                            <p style="color: #666; margin-bottom: 10px;">目標: 週3回</p>
+                            <div style="display: flex; gap: 5px;">
+                                ${Array(7).fill(0).map((_, i) => 
+                                    `<div style="width: 40px; height: 40px; background: ${[0,2,4,5].includes(i) ? '#4CAF50' : '#e0e0e0'}; border-radius: 4px;"></div>`
+                                ).join('')}
+                            </div>
+                            <p style="margin-top: 10px;">連続: 12日 🔥</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>📚 読書</h3>
+                            <p style="color: #666; margin-bottom: 10px;">目標: 毎日30分</p>
+                            <div style="display: flex; gap: 5px;">
+                                ${Array(7).fill(0).map((_, i) => 
+                                    `<div style="width: 40px; height: 40px; background: ${[0,1,2,3,4,6].includes(i) ? '#2196F3' : '#e0e0e0'}; border-radius: 4px;"></div>`
+                                ).join('')}
+                            </div>
+                            <p style="margin-top: 10px;">連続: 5日 🔥</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>🧘 瞑想</h3>
+                            <p style="color: #666; margin-bottom: 10px;">目標: 毎日10分</p>
+                            <div style="display: flex; gap: 5px;">
+                                ${Array(7).fill(0).map((_, i) => 
+                                    `<div style="width: 40px; height: 40px; background: ${[1,2,3,5].includes(i) ? '#9C27B0' : '#e0e0e0'}; border-radius: 4px;"></div>`
+                                ).join('')}
+                            </div>
+                            <p style="margin-top: 10px;">連続: 3日</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'journal',
+                name: '日記・ジャーナル',
+                category: '自己管理',
+                icon: '📔',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>今日の日記</h2>
+                            <p>2024年1月23日（火）</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">今日の気分</label>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="demo-button">😊 最高</button>
+                                <button class="demo-button" style="background: #4CAF50;">😌 良い</button>
+                                <button class="demo-button">😐 普通</button>
+                                <button class="demo-button">😔 悪い</button>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">今日の出来事</label>
+                            <textarea class="demo-input" rows="10" placeholder="今日はどんな一日でしたか？">今日は朝から天気が良く、気持ちよく一日をスタートできた。
+
+午前中は集中して仕事に取り組み、予定していたタスクを完了できた。
+
+お昼は同僚と新しくオープンしたカフェでランチ。パスタが美味しかった。
+
+午後は会議が続いたが、建設的な議論ができて良かった。
+
+夕方にジムで運動。最近続けている習慣が身についてきた感じがする。</textarea>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">感謝すること（3つ）</label>
+                            <input type="text" class="demo-input" placeholder="1. " value="1. 健康でいられること">
+                            <input type="text" class="demo-input" placeholder="2. " value="2. 仕事が順調に進んだこと">
+                            <input type="text" class="demo-input" placeholder="3. " value="3. 美味しいランチを楽しめたこと">
+                        </div>
+                        <button class="demo-button">保存する</button>
+                    </div>
+                `
+            },
+            {
+                id: 'goal',
+                name: '目標管理',
+                category: '自己管理',
+                icon: '🎯',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>目標管理</h2>
+                            <p>2024年 第1四半期</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>🎯 年間目標</h3>
+                            <p>新しいスキルを3つ習得する</p>
+                            <div style="margin-top: 10px;">
+                                <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
+                                    <div style="background: #4CAF50; height: 100%; width: 33%; transition: width 0.3s;"></div>
+                                </div>
+                                <p style="margin-top: 5px; text-align: right;">1/3 完了</p>
+                            </div>
+                        </div>
+                        <div class="demo-card">
+                            <h3>📊 今月の目標</h3>
+                            <div style="margin-bottom: 15px;">
+                                <p>✅ Reactの基礎を学ぶ</p>
+                                <div style="background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 5px;">
+                                    <div style="background: #4CAF50; height: 100%; width: 100%;"></div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <p>🔄 ポートフォリオサイトを作成</p>
+                                <div style="background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 5px;">
+                                    <div style="background: #2196F3; height: 100%; width: 60%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <p>📝 技術ブログを5本書く</p>
+                                <div style="background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 5px;">
+                                    <div style="background: #FF9800; height: 100%; width: 40%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="demo-button">+ 新しい目標を追加</button>
+                    </div>
+                `
+            },
+            {
+                id: 'time',
+                name: '時間管理',
+                category: '自己管理',
+                icon: '⏱️',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>時間管理</h2>
+                            <p>ポモドーロタイマー</p>
+                        </div>
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="font-size: 72px; font-weight: bold; margin-bottom: 20px;">25:00</div>
+                            <div style="margin-bottom: 30px;">
+                                <button class="demo-button" style="font-size: 20px; padding: 15px 40px;">開始</button>
+                            </div>
+                            <div style="display: flex; justify-content: center; gap: 10px;">
+                                <button class="demo-button">ポモドーロ</button>
+                                <button class="demo-button">短い休憩</button>
+                                <button class="demo-button">長い休憩</button>
+                            </div>
+                        </div>
+                        <div class="demo-card">
+                            <h3>今日の記録</h3>
+                            <div class="demo-list-item">
+                                <span>プログラミング</span>
+                                <span>3ポモドーロ (1時間15分)</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <span>読書</span>
+                                <span>2ポモドーロ (50分)</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <span>運動</span>
+                                <span>1ポモドーロ (25分)</span>
+                            </div>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                                <strong>合計: 6ポモドーロ (2時間30分)</strong>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'finance',
+                name: '財務管理',
+                category: '自己管理',
+                icon: '💰',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>家計簿</h2>
+                            <p>2024年1月</p>
+                        </div>
+                        <div class="demo-grid">
+                            <div class="demo-card">
+                                <h3>💵 収入</h3>
+                                <p style="font-size: 24px; font-weight: bold; color: #4CAF50;">¥350,000</p>
+                            </div>
+                            <div class="demo-card">
+                                <h3>💸 支出</h3>
+                                <p style="font-size: 24px; font-weight: bold; color: #f44336;">¥243,500</p>
+                            </div>
+                            <div class="demo-card">
+                                <h3>💰 残高</h3>
+                                <p style="font-size: 24px; font-weight: bold;">¥106,500</p>
+                            </div>
+                            <div class="demo-card">
+                                <h3>📊 貯蓄率</h3>
+                                <p style="font-size: 24px; font-weight: bold;">30.4%</p>
+                            </div>
+                        </div>
+                        <div class="demo-card" style="margin-top: 20px;">
+                            <h3>最近の取引</h3>
+                            <div class="demo-list-item">
+                                <div>
+                                    <span>🍕 ランチ</span>
+                                    <span style="color: #666; margin-left: 10px;">食費</span>
+                                </div>
+                                <span style="color: #f44336;">-¥1,200</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <div>
+                                    <span>🚃 交通費</span>
+                                    <span style="color: #666; margin-left: 10px;">交通</span>
+                                </div>
+                                <span style="color: #f44336;">-¥320</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <div>
+                                    <span>💰 給料</span>
+                                    <span style="color: #666; margin-left: 10px;">収入</span>
+                                </div>
+                                <span style="color: #4CAF50;">+¥350,000</span>
+                            </div>
+                        </div>
+                        <button class="demo-button">+ 取引を追加</button>
+                    </div>
+                `
+            },
+
+            // 便利サービス
+            {
+                id: 'chat',
+                name: 'チャット',
+                category: '便利サービス',
+                icon: '💬',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>チャットルーム</h2>
+                            <p>開発チーム</p>
+                        </div>
+                        <div style="height: 400px; background: #f8f9fa; border-radius: 8px; padding: 20px; overflow-y: auto;">
+                            <div style="margin-bottom: 15px;">
+                                <strong>田中</strong> <span style="color: #666; font-size: 12px;">10:23</span>
+                                <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 5px;">
+                                    おはようございます！今日のミーティングは予定通り14時からですか？
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 15px; text-align: right;">
+                                <strong>あなた</strong> <span style="color: #666; font-size: 12px;">10:25</span>
+                                <div style="background: #2196F3; color: white; padding: 10px; border-radius: 8px; margin-top: 5px; display: inline-block;">
+                                    はい、14時から開始予定です。議題は共有済みです。
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <strong>鈴木</strong> <span style="color: #666; font-size: 12px;">10:30</span>
+                                <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 5px;">
+                                    了解です！資料確認しておきます 👍
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="text" class="demo-input" placeholder="メッセージを入力..." style="flex: 1;">
+                            <button class="demo-button">送信</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'map',
+                name: 'マップ連携',
+                category: '便利サービス',
+                icon: '🗺️',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>店舗検索</h2>
+                            <p>現在地から近い店舗</p>
+                        </div>
+                        <div style="background: #e0e0e0; height: 300px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 20px;">
+                            <p style="color: #666;">[地図表示エリア]</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>📍 渋谷店</h3>
+                            <p>東京都渋谷区道玄坂1-2-3</p>
+                            <p style="color: #666;">営業時間: 10:00-21:00</p>
+                            <p style="color: #2196F3;">現在地から 1.2km</p>
+                            <button class="demo-button" style="margin-top: 10px;">ルート案内</button>
+                        </div>
+                        <div class="demo-card">
+                            <h3>📍 新宿店</h3>
+                            <p>東京都新宿区西新宿3-4-5</p>
+                            <p style="color: #666;">営業時間: 10:00-20:00</p>
+                            <p style="color: #2196F3;">現在地から 3.5km</p>
+                            <button class="demo-button" style="margin-top: 10px;">ルート案内</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'media',
+                name: 'メディア管理',
+                category: '便利サービス',
+                icon: '🖼️',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h2>フォトギャラリー</h2>
+                            <button class="demo-button">+ アップロード</button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+                            ${Array(6).fill(0).map((_, i) => `
+                                <div style="background: #f0f0f0; padding-bottom: 100%; position: relative; border-radius: 8px; overflow: hidden;">
+                                    <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #999;">
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 48px;">🖼️</div>
+                                            <p>画像${i + 1}.jpg</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div style="margin-top: 20px; text-align: center;">
+                            <button class="demo-button">もっと見る</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'collaboration',
+                name: '共有・コラボ',
+                category: '便利サービス',
+                icon: '👥',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>共同編集ドキュメント</h2>
+                            <p>プロジェクト計画書</p>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <span>共有中:</span>
+                                <div style="display: flex; gap: -10px;">
+                                    <div style="width: 30px; height: 30px; background: #4CAF50; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">田</div>
+                                    <div style="width: 30px; height: 30px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">鈴</div>
+                                    <div style="width: 30px; height: 30px; background: #FF9800; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">+3</div>
+                                </div>
+                                <button class="demo-button">共有設定</button>
+                            </div>
+                        </div>
+                        <div style="background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; min-height: 300px;">
+                            <h1 style="margin-bottom: 15px;">プロジェクト計画書</h1>
+                            <h2 style="margin-bottom: 10px;">1. 概要</h2>
+                            <p style="margin-bottom: 15px;">このプロジェクトは、新しいWebアプリケーションの開発を目的としています。</p>
+                            <h2 style="margin-bottom: 10px;">2. スケジュール</h2>
+                            <ul>
+                                <li>第1フェーズ: 要件定義 (1月)</li>
+                                <li>第2フェーズ: 設計 (2月)</li>
+                                <li>第3フェーズ: 開発 (3-4月)</li>
+                            </ul>
+                            <div style="margin-top: 20px; padding: 10px; background: #fff3cd; border-radius: 4px;">
+                                <strong>田中さんがコメント:</strong> スケジュールについて相談したいです。
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'notification',
+                name: '通知・アラート',
+                category: '便利サービス',
+                icon: '🔔',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>通知設定</h2>
+                            <p>リマインダーとアラート</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>🔔 アクティブな通知</h3>
+                            <div class="demo-list-item">
+                                <div>
+                                    <span>毎日の薬リマインダー</span>
+                                    <p style="color: #666; font-size: 14px;">毎日 9:00, 21:00</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span style="color: #4CAF50;">ON</span>
+                                </label>
+                            </div>
+                            <div class="demo-list-item">
+                                <div>
+                                    <span>週次レポート提出</span>
+                                    <p style="color: #666; font-size: 14px;">毎週金曜 17:00</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" checked>
+                                    <span style="color: #4CAF50;">ON</span>
+                                </label>
+                            </div>
+                            <div class="demo-list-item">
+                                <div>
+                                    <span>誕生日リマインダー</span>
+                                    <p style="color: #666; font-size: 14px;">当日の朝9:00</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox">
+                                    <span style="color: #999;">OFF</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="demo-card">
+                            <h3>📱 通知方法</h3>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" checked> プッシュ通知
+                            </label>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox" checked> メール通知
+                            </label>
+                            <label style="display: block; margin-bottom: 10px;">
+                                <input type="checkbox"> SMS通知
+                            </label>
+                        </div>
+                        <button class="demo-button">+ 新しい通知を追加</button>
+                    </div>
+                `
+            },
+
+            // ゲーム
+            {
+                id: 'card',
+                name: 'カードゲーム',
+                category: 'ゲーム',
+                icon: '🃏',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>カードゲーム</h2>
+                            <p>スコア: 1,250</p>
+                        </div>
+                        <div style="background: #2e7d32; padding: 40px; border-radius: 8px;">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <div style="display: inline-block; width: 80px; height: 120px; background: white; border-radius: 8px; margin: 0 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 48px;">
+                                    ♠️
+                                </div>
+                                <div style="display: inline-block; width: 80px; height: 120px; background: white; border-radius: 8px; margin: 0 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 48px;">
+                                    ♥️
+                                </div>
+                                <div style="display: inline-block; width: 80px; height: 120px; background: #1976D2; border-radius: 8px; margin: 0 5px;"></div>
+                            </div>
+                            <div style="text-align: center;">
+                                <p style="color: white; margin-bottom: 20px;">あなたの手札</p>
+                                <div>
+                                    <div style="display: inline-block; width: 80px; height: 120px; background: white; border-radius: 8px; margin: 0 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 48px;">
+                                        ♦️
+                                    </div>
+                                    <div style="display: inline-block; width: 80px; height: 120px; background: white; border-radius: 8px; margin: 0 5px; display: inline-flex; align-items: center; justify-content: center; font-size: 48px;">
+                                        ♣️
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="demo-button">カードを引く</button>
+                            <button class="demo-button">パス</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'puzzle',
+                name: 'パズルゲーム',
+                category: 'ゲーム',
+                icon: '🧩',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h2>マッチ3パズル</h2>
+                            <div>
+                                <span style="margin-right: 20px;">レベル: 12</span>
+                                <span>スコア: 45,780</span>
+                            </div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; max-width: 400px; margin: 0 auto;">
+                                ${Array(64).fill(0).map(() => {
+                                    const gems = ['💎', '💚', '💛', '💜', '❤️'];
+                                    return `<div style="background: white; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 24px; border-radius: 4px; cursor: pointer;">
+                                        ${gems[Math.floor(Math.random() * gems.length)]}
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p style="margin-bottom: 10px;">残り手数: 25</p>
+                            <button class="demo-button">ヒント</button>
+                            <button class="demo-button">シャッフル</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'quiz',
+                name: 'クイズゲーム',
+                category: 'ゲーム',
+                icon: '❓',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>クイズチャレンジ</h2>
+                            <p>問題 5/10</p>
+                        </div>
+                        <div class="demo-card" style="text-align: center;">
+                            <h3 style="font-size: 24px; margin-bottom: 30px;">日本で一番高い山は？</h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 400px; margin: 0 auto;">
+                                <button class="demo-button" style="padding: 20px;">A. 富士山</button>
+                                <button class="demo-button" style="padding: 20px;">B. 北岳</button>
+                                <button class="demo-button" style="padding: 20px;">C. 穂高岳</button>
+                                <button class="demo-button" style="padding: 20px;">D. 槍ヶ岳</button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
+                                <div style="background: #4CAF50; height: 100%; width: 50%; transition: width 0.3s;"></div>
+                            </div>
+                            <p style="text-align: center; margin-top: 10px;">正解率: 4/5</p>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p>制限時間: 30秒</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'action',
+                name: 'アクションゲーム',
+                category: 'ゲーム',
+                icon: '🎮',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h2>スペースシューター</h2>
+                            <div>
+                                <span style="margin-right: 20px;">❤️❤️❤️</span>
+                                <span>スコア: 12,500</span>
+                            </div>
+                        </div>
+                        <div style="background: #000; color: white; height: 400px; display: flex; align-items: center; justify-content: center; border-radius: 8px; position: relative;">
+                            <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%);">
+                                <p>WAVE 3</p>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 20px;">🚀</div>
+                                <p>[ゲーム画面]</p>
+                                <p style="margin-top: 20px;">タップまたは矢印キーで操作</p>
+                            </div>
+                            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
+                                <button class="demo-button">一時停止</button>
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button class="demo-button">← 左</button>
+                            <button class="demo-button">撃つ</button>
+                            <button class="demo-button">右 →</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'board',
+                name: 'ボードゲーム',
+                category: 'ゲーム',
+                icon: '♟️',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>チェス</h2>
+                            <p>あなた (白) vs コンピュータ (黒)</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                            <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 0; max-width: 400px; margin: 0 auto; border: 2px solid #333;">
+                                ${Array(64).fill(0).map((_, i) => {
+                                    const row = Math.floor(i / 8);
+                                    const col = i % 8;
+                                    const isBlack = (row + col) % 2 === 1;
+                                    const pieces = ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'];
+                                    let piece = '';
+                                    if (row === 0) piece = pieces[col];
+                                    if (row === 1) piece = '♟';
+                                    if (row === 6) piece = '♙';
+                                    if (row === 7) piece = ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'][col];
+                                    
+                                    return `<div style="background: ${isBlack ? '#8b4513' : '#deb887'}; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                        ${piece}
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p>あなたの番です</p>
+                            <button class="demo-button">ヒント</button>
+                            <button class="demo-button">待った</button>
+                        </div>
+                    </div>
+                `
+            },
+
+            // AIエージェント
+            {
+                id: 'chatbot',
+                name: 'チャットボット',
+                category: 'AIエージェント',
+                icon: '🤖',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>AIアシスタント</h2>
+                            <p>なんでも聞いてください</p>
+                        </div>
+                        <div style="height: 400px; background: #f8f9fa; border-radius: 8px; padding: 20px; overflow-y: auto;">
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; align-items: start; gap: 10px;">
+                                    <div style="width: 40px; height: 40px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                        🤖
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <strong>AIアシスタント</strong>
+                                        <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 5px;">
+                                            こんにちは！何かお手伝いできることはありますか？
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; align-items: start; gap: 10px; justify-content: flex-end;">
+                                    <div style="flex: 1; text-align: right;">
+                                        <strong>あなた</strong>
+                                        <div style="background: #2196F3; color: white; padding: 10px; border-radius: 8px; margin-top: 5px; display: inline-block;">
+                                            今日の天気を教えてください
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <div style="display: flex; align-items: start; gap: 10px;">
+                                    <div style="width: 40px; height: 40px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                                        🤖
+                                    </div>
+                                    <div style="flex: 1;">
+                                        <strong>AIアシスタント</strong>
+                                        <div style="background: white; padding: 10px; border-radius: 8px; margin-top: 5px;">
+                                            申し訳ございません。リアルタイムの天気情報にはアクセスできませんが、天気予報サイトやアプリでご確認いただけます。他に何かお手伝いできることはありますか？
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-top: 10px;">
+                            <input type="text" class="demo-input" placeholder="メッセージを入力..." style="flex: 1;">
+                            <button class="demo-button">送信</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'image-recognition',
+                name: '画像認識',
+                category: 'AIエージェント',
+                icon: '📷',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>画像認識AI</h2>
+                            <p>画像から物体を識別します</p>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 40px; border-radius: 8px; text-align: center;">
+                            <div style="width: 200px; height: 200px; background: #e0e0e0; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                                <div>
+                                    <div style="font-size: 48px;">📷</div>
+                                    <p style="color: #666;">画像をアップロード</p>
+                                </div>
+                            </div>
+                            <button class="demo-button" style="margin-top: 20px;">ファイルを選択</button>
+                            <p style="color: #666; margin-top: 10px;">またはドラッグ&ドロップ</p>
+                        </div>
+                        <div class="demo-card" style="margin-top: 20px;">
+                            <h3>認識結果</h3>
+                            <div class="demo-list-item">
+                                <span>猫</span>
+                                <span style="color: #4CAF50;">98.5%</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <span>動物</span>
+                                <span style="color: #4CAF50;">99.2%</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <span>ペット</span>
+                                <span style="color: #FF9800;">87.3%</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'voice',
+                name: '音声アシスタント',
+                category: 'AIエージェント',
+                icon: '🎤',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>音声アシスタント</h2>
+                            <p>話しかけて操作</p>
+                        </div>
+                        <div style="text-align: center; padding: 40px;">
+                            <div style="width: 150px; height: 150px; background: #2196F3; border-radius: 50%; margin: 0 auto; display: flex; align-items: center; justify-content: center; color: white; font-size: 48px;">
+                                🎤
+                            </div>
+                            <p style="margin-top: 20px; font-size: 18px;">「こんにちは」と話しかけてください</p>
+                            <button class="demo-button" style="margin-top: 20px; font-size: 18px; padding: 15px 30px;">
+                                音声認識を開始
+                            </button>
+                        </div>
+                        <div class="demo-card">
+                            <h3>認識された音声</h3>
+                            <p style="font-size: 18px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                                「今日の天気を教えて」
+                            </p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>応答</h3>
+                            <p>今日は晴れで、最高気温は25度の予報です。</p>
+                            <button class="demo-button">音声で読み上げ</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'data-analysis',
+                name: 'データ分析',
+                category: 'AIエージェント',
+                icon: '📊',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>AIデータ分析</h2>
+                            <p>データから洞察を発見</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>データアップロード</h3>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center;">
+                                <button class="demo-button">CSVファイルを選択</button>
+                                <p style="color: #666; margin-top: 10px;">sales_data_2024.csv (2.3MB)</p>
+                            </div>
+                        </div>
+                        <div class="demo-card">
+                            <h3>分析結果</h3>
+                            <div style="background: #e8f5e9; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                <strong>📈 売上トレンド</strong>
+                                <p>過去3ヶ月で15%の成長を確認。特に週末の売上が好調。</p>
+                            </div>
+                            <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                <strong>🎯 顧客セグメント</strong>
+                                <p>20-30代の顧客が全体の65%を占める。リピート率は45%。</p>
+                            </div>
+                            <div style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                                <strong>💡 推奨アクション</strong>
+                                <p>週末限定キャンペーンの実施により、さらなる売上向上が期待できます。</p>
+                            </div>
+                        </div>
+                        <button class="demo-button">詳細レポートを生成</button>
+                    </div>
+                `
+            },
+            {
+                id: 'automation',
+                name: '自動化ワークフロー',
+                category: 'AIエージェント',
+                icon: '⚡',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>自動化ワークフロー</h2>
+                            <p>タスクを自動化</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>アクティブなワークフロー</h3>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong>📧 メール自動返信</strong>
+                                        <p style="color: #666; font-size: 14px;">特定のキーワードを含むメールに自動返信</p>
+                                    </div>
+                                    <span class="demo-badge">実行中</span>
+                                </div>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong>📊 日次レポート作成</strong>
+                                        <p style="color: #666; font-size: 14px;">毎日18:00にレポートを自動生成して送信</p>
+                                    </div>
+                                    <span class="demo-badge">実行中</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-card">
+                            <h3>新しいワークフローを作成</h3>
+                            <div style="display: flex; align-items: center; gap: 10px; justify-content: center; padding: 20px;">
+                                <div style="text-align: center;">
+                                    <div style="width: 80px; height: 80px; background: #2196F3; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                                        📥
+                                    </div>
+                                    <p style="margin-top: 5px;">トリガー</p>
+                                </div>
+                                <div style="font-size: 24px;">→</div>
+                                <div style="text-align: center;">
+                                    <div style="width: 80px; height: 80px; background: #4CAF50; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                                        ⚙️
+                                    </div>
+                                    <p style="margin-top: 5px;">アクション</p>
+                                </div>
+                                <div style="font-size: 24px;">→</div>
+                                <div style="text-align: center;">
+                                    <div style="width: 80px; height: 80px; background: #FF9800; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;">
+                                        📤
+                                    </div>
+                                    <p style="margin-top: 5px;">結果</p>
+                                </div>
+                            </div>
+                            <button class="demo-button" style="width: 100%;">+ ワークフローを作成</button>
+                        </div>
+                    </div>
+                `
+            },
+
+            // 特殊用途
+            {
+                id: 'pwa',
+                name: 'PWA',
+                category: '特殊用途',
+                icon: '📱',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>PWAアプリ</h2>
+                            <p>オフライン対応モバイルアプリ</p>
+                        </div>
+                        <div style="max-width: 375px; margin: 0 auto;">
+                            <div style="background: #000; padding: 20px; border-radius: 20px;">
+                                <div style="background: white; border-radius: 10px; overflow: hidden;">
+                                    <div style="background: #2196F3; color: white; padding: 15px; text-align: center;">
+                                        <h3>モバイルアプリ</h3>
+                                    </div>
+                                    <div style="padding: 20px;">
+                                        <div class="demo-card" style="text-align: center;">
+                                            <div style="font-size: 48px;">📱</div>
+                                            <p style="margin-top: 10px;">このアプリはオフラインでも動作します</p>
+                                            <button class="demo-button" style="margin-top: 20px;">
+                                                ホーム画面に追加
+                                            </button>
+                                        </div>
+                                        <div class="demo-card">
+                                            <h4>PWA機能</h4>
+                                            <p>✅ オフライン対応</p>
+                                            <p>✅ プッシュ通知</p>
+                                            <p>✅ ホーム画面に追加</p>
+                                            <p>✅ 高速読み込み</p>
+                                        </div>
+                                    </div>
+                                    <div style="background: #f8f9fa; padding: 15px; text-align: center;">
+                                        <p style="color: #666; font-size: 14px;">バージョン 1.0.0</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'admin',
+                name: '管理画面',
+                category: '特殊用途',
+                icon: '⚙️',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>管理者ダッシュボード</h2>
+                            <p>システム管理</p>
+                        </div>
+                        <div class="demo-grid">
+                            <div class="demo-card">
+                                <h3>👥 ユーザー管理</h3>
+                                <p style="font-size: 24px; font-weight: bold;">1,234</p>
+                                <p>登録ユーザー数</p>
+                                <button class="demo-button" style="margin-top: 10px;">管理</button>
+                            </div>
+                            <div class="demo-card">
+                                <h3>🔐 権限設定</h3>
+                                <p style="font-size: 24px; font-weight: bold;">5</p>
+                                <p>ロール数</p>
+                                <button class="demo-button" style="margin-top: 10px;">設定</button>
+                            </div>
+                            <div class="demo-card">
+                                <h3>📊 システム状態</h3>
+                                <p style="font-size: 24px; font-weight: bold; color: #4CAF50;">正常</p>
+                                <p>稼働率: 99.9%</p>
+                                <button class="demo-button" style="margin-top: 10px;">詳細</button>
+                            </div>
+                            <div class="demo-card">
+                                <h3>📝 ログ</h3>
+                                <p style="font-size: 24px; font-weight: bold;">523</p>
+                                <p>今日のイベント</p>
+                                <button class="demo-button" style="margin-top: 10px;">表示</button>
+                            </div>
+                        </div>
+                        <div class="demo-card" style="margin-top: 20px;">
+                            <h3>最近のアクティビティ</h3>
+                            <div class="demo-list-item">
+                                <span>ユーザー登録: user@example.com</span>
+                                <span style="color: #666;">5分前</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <span>設定変更: セキュリティポリシー更新</span>
+                                <span style="color: #666;">1時間前</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <span>システムバックアップ完了</span>
+                                <span style="color: #666;">3時間前</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'landing',
+                name: 'ランディングページ',
+                category: '特殊用途',
+                icon: '🚀',
+                content: `
+                    <div class="demo-container">
+                        <div style="text-align: center; padding: 60px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px;">
+                            <h1 style="font-size: 48px; margin-bottom: 20px;">革新的なソリューション</h1>
+                            <p style="font-size: 20px; margin-bottom: 30px;">あなたのビジネスを次のレベルへ</p>
+                            <button class="demo-button" style="font-size: 18px; padding: 15px 40px; background: white; color: #667eea;">
+                                今すぐ始める
+                            </button>
+                        </div>
+                        <div style="padding: 60px 0;">
+                            <h2 style="text-align: center; margin-bottom: 40px;">主な機能</h2>
+                            <div class="demo-grid">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 48px;">⚡</div>
+                                    <h3>高速処理</h3>
+                                    <p>従来の3倍の処理速度</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 48px;">🔒</div>
+                                    <h3>セキュア</h3>
+                                    <p>最高レベルのセキュリティ</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 48px;">📈</div>
+                                    <h3>分析機能</h3>
+                                    <p>詳細なデータ分析</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="background: #f8f9fa; padding: 40px; border-radius: 8px; text-align: center;">
+                            <h2 style="margin-bottom: 20px;">お客様の声</h2>
+                            <p style="font-style: italic; font-size: 18px; margin-bottom: 10px;">
+                                "このサービスのおかげで業務効率が大幅に向上しました"
+                            </p>
+                            <p>- 山田太郎様（株式会社サンプル）</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'ecommerce',
+                name: 'Eコマース',
+                category: '特殊用途',
+                icon: '🛒',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h2>オンラインショップ</h2>
+                            <div>
+                                <button class="demo-button">🛒 カート (3)</button>
+                            </div>
+                        </div>
+                        <div class="demo-grid">
+                            <div class="demo-card" style="text-align: center;">
+                                <div style="background: #f0f0f0; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px;">
+                                    <span style="font-size: 48px;">👕</span>
+                                </div>
+                                <h3>Tシャツ</h3>
+                                <p style="color: #666;">快適な着心地</p>
+                                <p style="font-size: 24px; font-weight: bold; color: #f44336;">¥2,980</p>
+                                <button class="demo-button">カートに追加</button>
+                            </div>
+                            <div class="demo-card" style="text-align: center;">
+                                <div style="background: #f0f0f0; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px;">
+                                    <span style="font-size: 48px;">👖</span>
+                                </div>
+                                <h3>ジーンズ</h3>
+                                <p style="color: #666;">定番デニム</p>
+                                <p style="font-size: 24px; font-weight: bold; color: #f44336;">¥5,980</p>
+                                <button class="demo-button">カートに追加</button>
+                            </div>
+                            <div class="demo-card" style="text-align: center;">
+                                <div style="background: #f0f0f0; height: 150px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px;">
+                                    <span style="font-size: 48px;">👟</span>
+                                </div>
+                                <h3>スニーカー</h3>
+                                <p style="color: #666;">歩きやすい</p>
+                                <p style="font-size: 24px; font-weight: bold; color: #f44336;">¥7,980</p>
+                                <button class="demo-button">カートに追加</button>
+                            </div>
+                        </div>
+                        <div class="demo-card" style="margin-top: 20px;">
+                            <h3>カートの中身</h3>
+                            <div class="demo-list-item">
+                                <span>Tシャツ × 2</span>
+                                <span>¥5,960</span>
+                            </div>
+                            <div class="demo-list-item">
+                                <span>ジーンズ × 1</span>
+                                <span>¥5,980</span>
+                            </div>
+                            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; display: flex; justify-content: space-between;">
+                                <strong>合計</strong>
+                                <strong>¥11,940</strong>
+                            </div>
+                            <button class="demo-button" style="width: 100%; margin-top: 15px;">レジに進む</button>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                id: 'learning',
+                name: '学習管理',
+                category: '特殊用途',
+                icon: '🎓',
+                content: `
+                    <div class="demo-container">
+                        <div class="demo-header">
+                            <h2>オンライン学習プラットフォーム</h2>
+                            <p>あなたの進捗: 全体の 65%</p>
+                        </div>
+                        <div class="demo-card">
+                            <h3>📚 受講中のコース</h3>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                                <h4>プログラミング基礎</h4>
+                                <p style="color: #666;">レッスン 12/20 完了</p>
+                                <div style="background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px;">
+                                    <div style="background: #4CAF50; height: 100%; width: 60%;"></div>
+                                </div>
+                                <button class="demo-button" style="margin-top: 10px;">続きを学習</button>
+                            </div>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                                <h4>データ分析入門</h4>
+                                <p style="color: #666;">レッスン 5/15 完了</p>
+                                <div style="background: #e0e0e0; height: 10px; border-radius: 5px; overflow: hidden; margin-top: 10px;">
+                                    <div style="background: #2196F3; height: 100%; width: 33%;"></div>
+                                </div>
+                                <button class="demo-button" style="margin-top: 10px;">続きを学習</button>
+                            </div>
+                        </div>
+                        <div class="demo-card">
+                            <h3>🏆 実績</h3>
+                            <div style="display: flex; gap: 20px; justify-content: center;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 48px;">🥇</div>
+                                    <p>初心者</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 48px;">🏃</div>
+                                    <p>7日連続</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 48px;">💯</div>
+                                    <p>満点獲得</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="demo-card">
+                            <h3>📅 今週の学習時間</h3>
+                            <div style="display: flex; justify-content: space-around; align-items: end; height: 100px;">
+                                <div style="text-align: center;">
+                                    <div style="background: #4CAF50; width: 30px; height: 60px;"></div>
+                                    <p style="font-size: 12px; margin-top: 5px;">月</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="background: #4CAF50; width: 30px; height: 80px;"></div>
+                                    <p style="font-size: 12px; margin-top: 5px;">火</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="background: #4CAF50; width: 30px; height: 40px;"></div>
+                                    <p style="font-size: 12px; margin-top: 5px;">水</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="background: #4CAF50; width: 30px; height: 90px;"></div>
+                                    <p style="font-size: 12px; margin-top: 5px;">木</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="background: #2196F3; width: 30px; height: 70px;"></div>
+                                    <p style="font-size: 12px; margin-top: 5px;">金</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="background: #e0e0e0; width: 30px; height: 0px;"></div>
+                                    <p style="font-size: 12px; margin-top: 5px;">土</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="background: #e0e0e0; width: 30px; height: 0px;"></div>
+                                    <p style="font-size: 12px; margin-top: 5px;">日</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        ];
+
+        // カテゴリー定義
+        const categories = [
+            { id: 'all', name: 'すべて', icon: '🏠' },
+            { id: '基本', name: '基本', icon: '🎯' },
+            { id: '自己管理', name: '自己管理', icon: '🏃' },
+            { id: '便利サービス', name: '便利サービス', icon: '🛠️' },
+            { id: 'ゲーム', name: 'ゲーム', icon: '🎮' },
+            { id: 'AIエージェント', name: 'AIエージェント', icon: '🤖' },
+            { id: '特殊用途', name: '特殊用途', icon: '📱' }
+        ];
+
+        // 現在のカテゴリー
+        let currentCategory = 'all';
+
+        // タブ生成
+        function generateTabs() {
+            const tabsContainer = document.getElementById('tabsContainer');
+            categories.forEach(category => {
+                const tab = document.createElement('button');
+                tab.className = 'tab';
+                tab.textContent = `${category.icon} ${category.name}`;
+                tab.onclick = () => selectCategory(category.id);
+                if (category.id === currentCategory) {
+                    tab.classList.add('active');
+                }
+                tabsContainer.appendChild(tab);
+            });
+        }
+
+        // カテゴリー選択
+        function selectCategory(categoryId) {
+            currentCategory = categoryId;
+            
+            // タブのアクティブ状態更新
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                tab.classList.toggle('active', categories[index].id === categoryId);
+            });
+            
+            // コンテンツ更新
+            generateContent();
+        }
+
+        // インデックス生成
+        function generateIndex() {
+            const indexGrid = document.getElementById('indexGrid');
+            indexGrid.innerHTML = '';
+            
+            templates.forEach(template => {
+                const indexItem = document.createElement('a');
+                indexItem.href = `#${template.id}`;
+                indexItem.className = 'index-item';
+                indexItem.innerHTML = `
+                    <div class="index-item-icon">${template.icon}</div>
+                    <div class="index-item-name">${template.name}</div>
+                `;
+                indexItem.onclick = (e) => {
+                    e.preventDefault();
+                    // すべてカテゴリーに切り替え
+                    selectCategory('all');
+                    // 少し待ってからスクロール
+                    setTimeout(() => {
+                        const element = document.getElementById(template.id);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }, 100);
+                };
+                indexGrid.appendChild(indexItem);
+            });
+        }
+
+        // コンテンツ生成
+        function generateContent() {
+            const container = document.getElementById('contentContainer');
+            container.innerHTML = '';
+            
+            const filteredTemplates = currentCategory === 'all' 
+                ? templates 
+                : templates.filter(t => t.category === currentCategory);
+            
+            filteredTemplates.forEach(template => {
+                const section = document.createElement('div');
+                section.className = 'template-section';
+                section.id = template.id;
+                
+                const view = document.createElement('div');
+                view.className = 'template-view active';
+                view.innerHTML = `
+                    <h2 style="margin-bottom: 20px;">${template.icon} ${template.name}テンプレート</h2>
+                    ${template.content}
+                `;
+                section.appendChild(view);
+                container.appendChild(section);
+            });
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTabs();
+            generateIndex();
+            generateContent();
+        });
+    </script>
+</body>
+</html>
