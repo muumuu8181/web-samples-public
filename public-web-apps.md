@@ -35,6 +35,7 @@
 - ドラッグ&ドロップ・デバッグログ完備
 - プロダクションレディなテンプレート
 - [詳細ドキュメント](./WEBAPP_TEMPLATE_README.md)
+- 🔐 [Google認証設定ガイド](./GOOGLE_AUTH_SETUP_GUIDE.md)
 
 ## 🚀 アクセス方法
 
