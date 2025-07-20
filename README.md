@@ -30,6 +30,15 @@
 - **アプリ一覧**: https://muumuu8181.github.io/web-samples-public/
 - **サンプルページ**: https://muumuu8181.github.io/web-samples-public/samples.html
 - **同期タスク**: https://muumuu8181.github.io/web-samples-public/simple-sync.html
+- **汎用Webアプリテンプレート**: https://muumuu8181.github.io/web-samples-public/webapp-template.html
+
+## 🚀 新機能: Webアプリテンプレート
+
+### Firebase完全対応の汎用テンプレート
+- **Google認証・リアルタイム同期・デバッグログ**を完備
+- **プロダクションレディ**で即座に利用可能
+- **タスク・ノート・会議・目標管理**に対応
+- 詳細: [WEBAPP_TEMPLATE_README.md](./WEBAPP_TEMPLATE_README.md)
 
 ## 📱 対応環境
 
