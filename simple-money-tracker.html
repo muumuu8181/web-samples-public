@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="シンプル家計簿 - 収入と支出を簡単管理">
+    <title>シンプル家計簿</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --danger: #f44336;
+            --bg: #f5f5f5;
+            --surface: #fff;
+            --text: #333;
+            --border: #ddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ヘッダー */
+        header {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .auth-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .auth-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* 日付ナビゲーション */
+        .date-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .date-nav button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        .current-date {
+            font-weight: bold;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        /* サマリーカード */
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .summary-amount {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .income-amount { color: var(--primary); }
+        .expense-amount { color: var(--danger); }
+        .balance-amount { color: #2196F3; }
+
+        /* 入力フォーム */
+        .quick-add {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-row input,
+        .input-row select {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .input-row input[type="number"] {
+            max-width: 150px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-income {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-expense {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* 記録リスト */
+        .records {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .records-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            font-weight: bold;
+        }
+
+        .record-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .record-item:hover {
+            background: #f9f9f9;
+        }
+
+        .record-icon {
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .record-details {
+            flex: 1;
+        }
+
+        .record-content {
+            font-weight: 500;
+        }
+
+        .record-category {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .record-amount {
+            font-size: 18px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        /* デバッグログ */
+        .debug-log {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #222;
+            color: #fff;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+        }
+
+        .debug-log.show {
+            display: block;
+        }
+
+        .debug-header {
+            background: #333;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+        }
+
+        .debug-content {
+            padding: 10px;
+        }
+
+        .debug-btn {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .debug-btn:hover {
+            background: #666;
+        }
+
+        .debug-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 600px) {
+            .summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-row {
+                flex-direction: column;
+            }
+            
+            .input-row input[type="number"] {
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 シンプル家計簿</h1>
+            <div class="user-info" id="userInfo">
+                <button class="auth-btn" id="authBtn">Googleでログイン</button>
+            </div>
+            <div class="date-nav">
+                <button id="prevDay">‹</button>
+                <div class="current-date" id="currentDate">2025年1月20日</div>
+                <button id="nextDay">›</button>
+            </div>
+        </header>
+
+        <!-- サマリー -->
+        <div class="summary">
+            <div class="summary-card">
+                <div class="summary-label">収入</div>
+                <div class="summary-amount income-amount" id="incomeTotal">¥0</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">支出</div>
+                <div class="summary-amount expense-amount" id="expenseTotal">¥0</div>
+            </div>
+            <div class="summary-card">
+                <div class="summary-label">残高</div>
+                <div class="summary-amount balance-amount" id="balanceTotal">¥0</div>
+            </div>
+        </div>
+
+        <!-- 保存先表示 -->
+        <div style="text-align: center; padding: 10px; background: #e3f2fd; border-radius: 8px; margin-bottom: 20px;" id="storageInfo">
+            <span id="storageLocation">📦 データ保存先: 未ログイン (LocalStorage)</span>
+        </div>
+
+        <!-- クイック入力 -->
+        <div class="quick-add">
+            <h3 style="margin-bottom: 15px;">記録を追加</h3>
+            <div class="input-row">
+                <input type="number" id="amount" placeholder="金額" min="0" step="1">
+                <input type="text" id="content" placeholder="内容（例：昼食、給料）">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-income" onclick="app.addRecord('income')">
+                    💰 収入として追加
+                </button>
+                <button class="btn btn-expense" onclick="app.addRecord('expense')">
+                    💸 支出として追加
+                </button>
+            </div>
+        </div>
+
+        <!-- 記録リスト -->
+        <div class="records">
+            <div class="records-header">本日の記録</div>
+            <div id="recordsList">
+                <div class="empty-state">まだ記録がありません</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- デバッグログ -->
+    <div class="debug-log" id="debugLog">
+        <div class="debug-header">
+            <span>デバッグログ</span>
+            <div>
+                <button class="debug-btn" onclick="testFirebaseConnection()">🔥接続テスト</button>
+                <button class="debug-btn" onclick="copyDebugLog()">コピー</button>
+                <button class="debug-btn" onclick="clearDebugLog()">クリア</button>
+                <button class="debug-btn" onclick="toggleDebug()">閉じる</button>
+            </div>
+        </div>
+        <div class="debug-content" id="debugContent"></div>
+    </div>
+    <button class="debug-toggle" onclick="toggleDebug()">ログ</button>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5PXKChizYDCXF_GJ4KL6Ylq9K5hCPXWE",
+            authDomain: "shares-b1b97.firebaseapp.com",
+            databaseURL: "https://shares-b1b97-default-rtdb.firebaseio.com",
+            projectId: "shares-b1b97",
+            storageBucket: "shares-b1b97.firebasestorage.app",
+            messagingSenderId: "38311063248",
+            appId: "1:38311063248:web:0d2d5726d12b305b24b8d5",
+            measurementId: "G-S2ZMJH7CGC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        class MoneyTracker {
+            constructor() {
+                this.currentDate = new Date();
+                this.currentUser = null;
+                this.records = [];
+                this.init();
+            }
+
+            init() {
+                this.log('アプリ初期化開始');
+                this.setupAuth();
+                this.setupEventListeners();
+                this.updateDateDisplay();
+                this.loadRecords();
+            }
+
+            log(message, data = null) {
+                const time = new Date().toLocaleTimeString();
+                const logMsg = `[${time}] ${message}`;
+                console.log(logMsg, data || '');
+                
+                const debugContent = document.getElementById('debugContent');
+                debugContent.innerHTML += `<div>${logMsg} ${data ? JSON.stringify(data) : ''}</div>`;
+                debugContent.scrollTop = debugContent.scrollHeight;
+            }
+
+            setupAuth() {
+                auth.onAuthStateChanged(user => {
+                    this.currentUser = user;
+                    this.updateUserUI();
+                    this.updateStorageInfo();
+                    if (user) {
+                        this.log('ユーザーログイン', user.email);
+                        this.loadRecords();
+                    } else {
+                        this.log('ユーザーログアウト');
+                        this.loadLocalRecords();
+                    }
+                });
+            }
+
+            updateStorageInfo() {
+                const storageLocation = document.getElementById('storageLocation');
+                if (this.currentUser) {
+                    storageLocation.innerHTML = '☁️ データ保存先: Firebase (クラウド・他端末と同期)';
+                    storageLocation.parentElement.style.background = '#c8e6c9';
+                } else {
+                    storageLocation.innerHTML = '📦 データ保存先: この端末のみ (LocalStorage)';
+                    storageLocation.parentElement.style.background = '#e3f2fd';
+                }
+            }
+
+            updateUserUI() {
+                const userInfo = document.getElementById('userInfo');
+                if (this.currentUser) {
+                    // ユーザー情報を詳細に表示
+                    const photoURL = this.currentUser.photoURL || 'https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png';
+                    userInfo.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <img src="${photoURL}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
+                            <div style="text-align: left;">
+                                <div style="font-weight: bold;">${this.currentUser.displayName || '名前未設定'}</div>
+                                <div style="font-size: 12px; color: #666;">${this.currentUser.email}</div>
+                            </div>
+                        </div>
+                        <button class="auth-btn" onclick="signOut()">ログアウト</button>
+                        <div style="margin-top: 10px; font-size: 11px; color: #666;">
+                            <div>UID: ${this.currentUser.uid}</div>
+                            <div>プロバイダ: ${this.currentUser.providerData[0]?.providerId || 'unknown'}</div>
+                            <div>最終ログイン: ${new Date(this.currentUser.metadata.lastSignInTime).toLocaleString('ja-JP')}</div>
+                        </div>
+                    `;
+                    
+                    // デバッグログに詳細情報を追加
+                    this.log('Google認証情報', {
+                        uid: this.currentUser.uid,
+                        email: this.currentUser.email,
+                        displayName: this.currentUser.displayName,
+                        photoURL: this.currentUser.photoURL,
+                        emailVerified: this.currentUser.emailVerified,
+                        provider: this.currentUser.providerData[0]?.providerId,
+                        creationTime: this.currentUser.metadata.creationTime,
+                        lastSignInTime: this.currentUser.metadata.lastSignInTime
+                    });
+                } else {
+                    userInfo.innerHTML = `
+                        <button class="auth-btn" onclick="signIn()">Googleでログイン</button>
+                    `;
+                }
+            }
+
+            setupEventListeners() {
+                document.getElementById('prevDay').addEventListener('click', () => {
+                    this.currentDate.setDate(this.currentDate.getDate() - 1);
+                    this.updateDateDisplay();
+                    this.loadRecords();
+                });
+
+                document.getElementById('nextDay').addEventListener('click', () => {
+                    this.currentDate.setDate(this.currentDate.getDate() + 1);
+                    this.updateDateDisplay();
+                    this.loadRecords();
+                });
+
+                document.getElementById('amount').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        document.getElementById('content').focus();
+                    }
+                });
+
+                document.getElementById('content').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.addRecord('expense');
+                    }
+                });
+            }
+
+            updateDateDisplay() {
+                const dateStr = this.currentDate.toLocaleDateString('ja-JP', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                document.getElementById('currentDate').textContent = dateStr;
+            }
+
+            getDateKey() {
+                return this.currentDate.toISOString().split('T')[0];
+            }
+
+            addRecord(type) {
+                this.log(`=== ${type} 記録追加処理開始 ===`);
+                
+                const amountInput = document.getElementById('amount');
+                const contentInput = document.getElementById('content');
+                
+                this.log('入力値取得', {
+                    amountValue: amountInput.value,
+                    contentValue: contentInput.value,
+                    type: type
+                });
+                
+                const amount = parseInt(amountInput.value);
+                const content = contentInput.value.trim();
+
+                this.log('パース後の値', {
+                    amount: amount,
+                    content: content,
+                    amountValid: !isNaN(amount) && amount > 0,
+                    contentValid: content.length > 0
+                });
+
+                if (!amount || amount <= 0) {
+                    this.log('❌ 金額エラー', {
+                        inputValue: amountInput.value,
+                        parsedAmount: amount,
+                        reason: 'amount <= 0 or NaN'
+                    });
+                    alert('金額を入力してください');
+                    return;
+                }
+
+                if (!content) {
+                    this.log('❌ 内容エラー', {
+                        inputValue: contentInput.value,
+                        trimmedContent: content,
+                        reason: 'content is empty'
+                    });
+                    alert('内容を入力してください');
+                    return;
+                }
+
+                const record = {
+                    id: Date.now().toString(),
+                    type: type,
+                    amount: amount,
+                    content: content,
+                    timestamp: Date.now()
+                };
+
+                this.log('✅ 記録オブジェクト作成', record);
+                this.log('保存処理開始...');
+
+                this.saveRecord(record);
+                
+                // 入力欄をクリア
+                amountInput.value = '';
+                contentInput.value = '';
+                amountInput.focus();
+
+                // 保存先を明示
+                const saveLocation = this.currentUser ? 'Firebase (クラウド)' : 'LocalStorage (この端末)';
+                this.log(`✅ 記録追加完了 - 保存先: ${saveLocation}`, record);
+                this.log(`=== ${type} 記録追加処理終了 ===`);
+            }
+
+            saveRecord(record) {
+                const dateKey = this.getDateKey();
+                
+                if (this.currentUser) {
+                    // Firebase に保存
+                    database.ref(`money-tracker/${this.currentUser.uid}/${dateKey}/${record.id}`)
+                        .set(record)
+                        .then(() => {
+                            this.log('Firebase保存成功', {
+                                location: 'Firebase Realtime Database',
+                                path: `money-tracker/${this.currentUser.uid}/${dateKey}/${record.id}`,
+                                syncStatus: '他のデバイスと同期されます'
+                            });
+                        })
+                        .catch(error => {
+                            this.log('Firebase保存エラー', error.message);
+                            this.saveToLocal(dateKey, record);
+                        });
+                } else {
+                    // ローカルストレージに保存
+                    this.saveToLocal(dateKey, record);
+                }
+            }
+
+            saveToLocal(dateKey, record) {
+                const localData = JSON.parse(localStorage.getItem('moneyTracker') || '{}');
+                if (!localData[dateKey]) {
+                    localData[dateKey] = {};
+                }
+                localData[dateKey][record.id] = record;
+                localStorage.setItem('moneyTracker', JSON.stringify(localData));
+                this.log('LocalStorage保存成功', {
+                    location: 'ブラウザのLocalStorage',
+                    key: 'moneyTracker',
+                    syncStatus: 'この端末のみ（同期されません）'
+                });
+                this.loadRecords();
+            }
+
+            loadRecords() {
+                const dateKey = this.getDateKey();
+                
+                if (this.currentUser) {
+                    // Firebase から読み込み
+                    database.ref(`money-tracker/${this.currentUser.uid}/${dateKey}`)
+                        .once('value')
+                        .then(snapshot => {
+                            const data = snapshot.val() || {};
+                            this.records = Object.values(data);
+                            this.renderRecords();
+                            
+                            // Firebase接続確認
+                            this.log('Firebaseデータ読み込み', {
+                                path: `money-tracker/${this.currentUser.uid}/${dateKey}`,
+                                recordCount: this.records.length,
+                                connected: database.app.auth().currentUser !== null
+                            });
+                        })
+                        .catch(error => {
+                            this.log('Firebase読み込みエラー', error);
+                        });
+                } else {
+                    this.loadLocalRecords();
+                }
+            }
+
+            loadLocalRecords() {
+                const dateKey = this.getDateKey();
+                const localData = JSON.parse(localStorage.getItem('moneyTracker') || '{}');
+                this.records = Object.values(localData[dateKey] || {});
+                this.renderRecords();
+            }
+
+            deleteRecord(recordId) {
+                if (confirm('この記録を削除しますか？')) {
+                    const dateKey = this.getDateKey();
+                    
+                    if (this.currentUser) {
+                        database.ref(`money-tracker/${this.currentUser.uid}/${dateKey}/${recordId}`)
+                            .remove()
+                            .then(() => {
+                                this.log('削除成功', recordId);
+                                this.loadRecords();
+                            });
+                    } else {
+                        const localData = JSON.parse(localStorage.getItem('moneyTracker') || '{}');
+                        if (localData[dateKey] && localData[dateKey][recordId]) {
+                            delete localData[dateKey][recordId];
+                            localStorage.setItem('moneyTracker', JSON.stringify(localData));
+                            this.loadRecords();
+                        }
+                    }
+                }
+            }
+
+            renderRecords() {
+                const recordsList = document.getElementById('recordsList');
+                
+                if (this.records.length === 0) {
+                    recordsList.innerHTML = '<div class="empty-state">まだ記録がありません</div>';
+                } else {
+                    // 時間順にソート（新しい順）
+                    const sortedRecords = [...this.records].sort((a, b) => b.timestamp - a.timestamp);
+                    
+                    recordsList.innerHTML = sortedRecords.map(record => `
+                        <div class="record-item">
+                            <div class="record-icon">${record.type === 'income' ? '💰' : '💸'}</div>
+                            <div class="record-details">
+                                <div class="record-content">${record.content}</div>
+                                <div class="record-category">${new Date(record.timestamp).toLocaleTimeString()}</div>
+                            </div>
+                            <div class="record-amount ${record.type}-amount">
+                                ${record.type === 'income' ? '+' : '-'}¥${record.amount.toLocaleString()}
+                            </div>
+                            <button class="delete-btn" onclick="app.deleteRecord('${record.id}')">×</button>
+                        </div>
+                    `).join('');
+                }
+
+                this.updateSummary();
+            }
+
+            updateSummary() {
+                const income = this.records
+                    .filter(r => r.type === 'income')
+                    .reduce((sum, r) => sum + r.amount, 0);
+                
+                const expense = this.records
+                    .filter(r => r.type === 'expense')
+                    .reduce((sum, r) => sum + r.amount, 0);
+                
+                const balance = income - expense;
+
+                document.getElementById('incomeTotal').textContent = `¥${income.toLocaleString()}`;
+                document.getElementById('expenseTotal').textContent = `¥${expense.toLocaleString()}`;
+                document.getElementById('balanceTotal').textContent = `¥${balance.toLocaleString()}`;
+            }
+        }
+
+        // アプリ初期化
+        const app = new MoneyTracker();
+
+        // グローバル関数
+        function signIn() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            // 常にアカウント選択画面を表示
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
+            
+            app.log('ログイン試行中...');
+            
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    // ログイン成功時の詳細情報
+                    const credential = result.credential;
+                    const token = credential.accessToken;
+                    const user = result.user;
+                    
+                    app.log('Googleログイン成功', {
+                        accessToken: token ? '取得済み' : 'なし',
+                        providerId: credential.providerId,
+                        signInMethod: credential.signInMethod,
+                        userEmail: user.email,
+                        isNewUser: result.additionalUserInfo.isNewUser
+                    });
+                })
+                .catch(error => {
+                    app.log('ログインエラー', {
+                        code: error.code,
+                        message: error.message,
+                        email: error.email,
+                        credential: error.credential
+                    });
+                    alert('ログインに失敗しました: ' + error.message);
+                });
+        }
+
+        function signOut() {
+            auth.signOut();
+        }
+
+        // デバッグログ表示切り替え
+        function toggleDebug() {
+            document.getElementById('debugLog').classList.toggle('show');
+        }
+
+        // デバッグログコピー
+        function copyDebugLog() {
+            const debugContent = document.getElementById('debugContent');
+            const text = debugContent.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('デバッグログをコピーしました');
+            }).catch(() => {
+                // フォールバック
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('デバッグログをコピーしました');
+            });
+        }
+
+        // デバッグログクリア
+        function clearDebugLog() {
+            document.getElementById('debugContent').innerHTML = '';
+            app.log('ログをクリアしました');
+        }
+
+        // Firebase接続テスト機能
+        function testFirebaseConnection() {
+            app.log('=== Firebase接続テスト開始 ===');
+            
+            // 1. Firebase SDK読み込み確認
+            app.log('Firebase SDK状態', {
+                app: typeof firebase !== 'undefined' ? '✅ 読み込み済み' : '❌ 未読み込み',
+                auth: typeof firebase.auth !== 'undefined' ? '✅ 認証SDK有効' : '❌ 認証SDK無効',
+                database: typeof firebase.database !== 'undefined' ? '✅ DB SDK有効' : '❌ DB SDK無効'
+            });
+
+            // 2. 現在の認証状態
+            const currentUser = auth.currentUser;
+            app.log('認証状態', {
+                isLoggedIn: currentUser ? '✅ ログイン中' : '❌ 未ログイン',
+                userUID: currentUser?.uid || 'なし',
+                email: currentUser?.email || 'なし'
+            });
+
+            // 3. データベース接続テスト
+            if (currentUser) {
+                const testRef = database.ref(`connection-test/${currentUser.uid}`);
+                const testData = {
+                    timestamp: Date.now(),
+                    message: 'Firebase接続テスト',
+                    userAgent: navigator.userAgent,
+                    url: window.location.href
+                };
+
+                app.log('Firebase書き込みテスト開始...');
+                testRef.set(testData)
+                    .then(() => {
+                        app.log('✅ Firebase書き込み成功', testData);
+                        
+                        // 読み込みテスト
+                        return testRef.once('value');
+                    })
+                    .then(snapshot => {
+                        const readData = snapshot.val();
+                        app.log('✅ Firebase読み込み成功', readData);
+                        
+                        // リアルタイム更新テスト
+                        const realtimeRef = database.ref(`realtime-test/${currentUser.uid}`);
+                        app.log('リアルタイム更新テスト開始...');
+                        
+                        realtimeRef.on('value', snapshot => {
+                            const data = snapshot.val();
+                            if (data) {
+                                app.log('✅ リアルタイム更新受信', data);
+                            }
+                        });
+
+                        // 2秒後にデータ更新
+                        setTimeout(() => {
+                            realtimeRef.set({
+                                timestamp: Date.now(),
+                                message: 'リアルタイム更新テスト成功',
+                                counter: Math.floor(Math.random() * 1000)
+                            });
+                        }, 2000);
+
+                    })
+                    .catch(error => {
+                        app.log('❌ Firebase操作エラー', {
+                            code: error.code,
+                            message: error.message
+                        });
+                    });
+            } else {
+                app.log('⚠️ ログインが必要です。Googleログインしてからテストを実行してください。');
+            }
+
+            // 4. ネットワーク接続確認
+            app.log('ネットワーク状態', {
+                online: navigator.onLine ? '✅ オンライン' : '❌ オフライン',
+                userAgent: navigator.userAgent.substring(0, 50) + '...'
+            });
+
+            app.log('=== Firebase接続テスト完了 ===');
+        }
+    </script>
+</body>
+</html>
