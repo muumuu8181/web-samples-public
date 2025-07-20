@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprite Splitter Debug - 問題診断版</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .debug-info {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .upload-area {
+            background: #222;
+            border: 2px dashed #555;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+        .upload-area:hover {
+            border-color: #0ff;
+        }
+        .upload-area.dragging {
+            border-color: #0f0;
+            background: rgba(0, 255, 0, 0.1);
+        }
+        .btn {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #555;
+        }
+        #log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            font-size: 12px;
+        }
+        .preview img {
+            max-width: 300px;
+            max-height: 300px;
+            border: 1px solid #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Sprite Splitter Debug Version</h1>
+    
+    <div class="debug-info">
+        <h3>ブラウザ情報</h3>
+        <div id="browserInfo"></div>
+    </div>
+
+    <div class="debug-info">
+        <h3>ファイルAPI対応状況</h3>
+        <div id="fileApiSupport"></div>
+    </div>
+
+    <div class="upload-area" id="uploadArea">
+        <p>📂 テスト: 画像をクリックまたはドラッグ&ドロップ</p>
+        <input type="file" id="fileInput" accept="image/*">
+        <button class="btn" onclick="document.getElementById('fileInput').click()">ファイル選択ボタン</button>
+    </div>
+
+    <div class="debug-info">
+        <h3>テスト用画像を作成</h3>
+        <button class="btn" onclick="createTestImage()">テスト画像を生成</button>
+        <div id="testImageArea"></div>
+    </div>
+
+    <div class="preview" id="preview" style="display:none;">
+        <h3>プレビュー</h3>
+        <img id="previewImg" alt="Preview">
+        <p id="imageInfo"></p>
+    </div>
+
+    <div class="debug-info">
+        <h3>ログ</h3>
+        <button class="btn" onclick="clearLog()">ログクリア</button>
+        <div id="log"></div>
+    </div>
+
+    <script>
+        let log = document.getElementById('log');
+        
+        function addLog(message) {
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML += `[${time}] ${message}<br>`;
+            log.scrollTop = log.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            log.innerHTML = '';
+        }
+
+        // Browser info
+        document.getElementById('browserInfo').innerHTML = `
+            <strong>User Agent:</strong> ${navigator.userAgent}<br>
+            <strong>Browser:</strong> ${navigator.appName}<br>
+            <strong>Version:</strong> ${navigator.appVersion}<br>
+            <strong>Platform:</strong> ${navigator.platform}
+        `;
+
+        // File API support check
+        let fileApiSupport = '';
+        fileApiSupport += `File API: ${window.File ? '✅' : '❌'}<br>`;
+        fileApiSupport += `FileReader: ${window.FileReader ? '✅' : '❌'}<br>`;
+        fileApiSupport += `FileList: ${window.FileList ? '✅' : '❌'}<br>`;
+        fileApiSupport += `Blob: ${window.Blob ? '✅' : '❌'}<br>`;
+        fileApiSupport += `Canvas: ${document.createElement('canvas').getContext ? '✅' : '❌'}<br>`;
+        document.getElementById('fileApiSupport').innerHTML = fileApiSupport;
+
+        addLog('ページロード完了');
+
+        // Event listeners
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', (e) => {
+            addLog('アップロードエリアクリック');
+            if (e.target === uploadArea) {
+                fileInput.click();
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            addLog(`ファイル選択イベント発生: ${e.target.files.length}個のファイル`);
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragging');
+            addLog('ドラッグオーバー');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            addLog('ドラッグリーブ');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragging');
+            addLog(`ドロップイベント: ${e.dataTransfer.files.length}個のファイル`);
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleFile(e.dataTransfer.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            addLog(`ファイル処理開始: ${file.name}`);
+            addLog(`ファイルタイプ: ${file.type}`);
+            addLog(`ファイルサイズ: ${file.size} bytes`);
+            
+            if (!file.type.startsWith('image/')) {
+                addLog('❌ 画像ファイルではありません');
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                addLog('✅ ファイル読み込み完了');
+                showPreview(e.target.result, file);
+            };
+            
+            reader.onerror = (e) => {
+                addLog('❌ ファイル読み込みエラー: ' + e.target.error);
+            };
+            
+            addLog('ファイル読み込み開始...');
+            reader.readAsDataURL(file);
+        }
+
+        function showPreview(dataUrl, file) {
+            const preview = document.getElementById('preview');
+            const img = document.getElementById('previewImg');
+            const info = document.getElementById('imageInfo');
+            
+            img.onload = () => {
+                addLog(`✅ 画像表示成功: ${img.naturalWidth}x${img.naturalHeight}`);
+                info.innerHTML = `
+                    <strong>ファイル名:</strong> ${file.name}<br>
+                    <strong>サイズ:</strong> ${img.naturalWidth} x ${img.naturalHeight}<br>
+                    <strong>ファイルサイズ:</strong> ${file.size} bytes<br>
+                    <strong>タイプ:</strong> ${file.type}
+                `;
+            };
+            
+            img.onerror = () => {
+                addLog('❌ 画像表示エラー');
+            };
+            
+            img.src = dataUrl;
+            preview.style.display = 'block';
+        }
+
+        function createTestImage() {
+            addLog('テスト画像生成開始');
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = 200;
+            canvas.height = 200;
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, 200, 200);
+            
+            // Grid lines
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            
+            // Horizontal lines
+            for (let y = 0; y <= 200; y += 50) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(200, y);
+                ctx.stroke();
+            }
+            
+            // Vertical lines
+            for (let x = 0; x <= 200; x += 50) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, 200);
+                ctx.stroke();
+            }
+            
+            // Colored squares
+            const colors = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'pink', 'cyan'];
+            let colorIndex = 0;
+            
+            for (let y = 0; y < 4; y++) {
+                for (let x = 0; x < 4; x++) {
+                    ctx.fillStyle = colors[colorIndex % colors.length];
+                    ctx.fillRect(x * 50 + 10, y * 50 + 10, 30, 30);
+                    colorIndex++;
+                }
+            }
+            
+            // Convert to blob and create download
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = 'test-sprite-sheet.png';
+                link.href = url;
+                link.click();
+                
+                addLog('✅ テスト画像ダウンロード開始');
+                
+                // Also show preview
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    showPreview(e.target.result, { 
+                        name: 'test-sprite-sheet.png', 
+                        type: 'image/png', 
+                        size: blob.size 
+                    });
+                };
+                reader.readAsDataURL(blob);
+                
+            }, 'image/png');
+        }
+
+        addLog('スクリプト初期化完了');
+    </script>
+</body>
+</html>
