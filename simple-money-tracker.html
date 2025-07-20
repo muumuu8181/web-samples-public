@@ -437,11 +437,22 @@
             }
 
             init() {
-                this.log('アプリ初期化開始');
+                this.log('=== アプリ初期化開始 ===');
                 this.setupAuth();
                 this.setupEventListeners();
                 this.updateDateDisplay();
+                
+                // 初期データ読み込み（認証状態に関係なく）
+                this.log('初期データ読み込み実行');
                 this.loadRecords();
+                
+                // 2秒後に再度データ読み込み（認証完了を待つ）
+                setTimeout(() => {
+                    this.log('認証完了後の再読み込み実行');
+                    this.loadRecords();
+                }, 2000);
+                
+                this.log('=== アプリ初期化完了 ===');
             }
 
             log(message, data = null) {
@@ -460,8 +471,12 @@
                     this.updateUserUI();
                     this.updateStorageInfo();
                     if (user) {
-                        this.log('ユーザーログイン', user.email);
-                        this.loadRecords();
+                        this.log('ユーザーログイン開始', user.email);
+                        this.log('Firebase データ読み込み開始...');
+                        // 認証完了後に確実にデータを読み込む
+                        setTimeout(() => {
+                            this.loadRecords();
+                        }, 100);
                     } else {
                         this.log('ユーザーログアウト');
                         this.loadLocalRecords();
@@ -665,27 +680,41 @@
 
             loadRecords() {
                 const dateKey = this.getDateKey();
+                this.log(`データ読み込み開始 - 日付: ${dateKey}`);
                 
                 if (this.currentUser) {
                     // Firebase から読み込み
-                    database.ref(`money-tracker/${this.currentUser.uid}/${dateKey}`)
+                    const path = `money-tracker/${this.currentUser.uid}/${dateKey}`;
+                    this.log(`Firebase パス: ${path}`);
+                    
+                    database.ref(path)
                         .once('value')
                         .then(snapshot => {
                             const data = snapshot.val() || {};
                             this.records = Object.values(data);
-                            this.renderRecords();
                             
-                            // Firebase接続確認
-                            this.log('Firebaseデータ読み込み', {
-                                path: `money-tracker/${this.currentUser.uid}/${dateKey}`,
+                            this.log('✅ Firebase データ読み込み完了', {
+                                path: path,
+                                dataExists: snapshot.exists(),
                                 recordCount: this.records.length,
-                                connected: database.app.auth().currentUser !== null
+                                rawData: data,
+                                userUID: this.currentUser.uid
                             });
+                            
+                            this.renderRecords();
+                            this.updateSummary();
                         })
                         .catch(error => {
-                            this.log('Firebase読み込みエラー', error);
+                            this.log('❌ Firebase読み込みエラー', {
+                                error: error.message,
+                                code: error.code,
+                                path: path
+                            });
+                            // エラー時はローカルデータにフォールバック
+                            this.loadLocalRecords();
                         });
                 } else {
+                    this.log('ローカルデータ読み込み開始');
                     this.loadLocalRecords();
                 }
             }
