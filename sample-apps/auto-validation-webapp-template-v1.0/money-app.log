@@ -1,0 +1,25 @@
+[2025-07-24T02:06:14.857Z] money-tracker: 共通基盤初期化完了 { appName: 'money-tracker' }
+money-tracker running on port 3001
+[2025-07-24T02:06:14.892Z] money-tracker: サーバー起動 { port: 3001 }
+💰 お金管理アプリが起動しました
+📱 アクセス: http://localhost:3001
+🧪 テスト実行: node testSuite.js money-tracker kanban-drag-drop
+[2025-07-24T02:06:23.411Z] money-tracker: フロントエンドページ要求 
+[2025-07-24T02:06:23.428Z] money-tracker: HTTP Request { method: 'GET', url: '/', status: 200, duration: 18 }
+[2025-07-24T02:06:30.283Z] money-tracker: HTTP Request {
+  method: 'POST',
+  url: '/api/generate-test-log',
+  status: 500,
+  duration: 9
+}
+TypeError: Cannot read properties of undefined (reading 'userInfo')
+    at /data/data/com.termux/files/home/common-template/common.js:146:36
+    at Layer.handleRequest (/data/data/com.termux/files/home/common-template/node_modules/router/lib/layer.js:152:17)
+    at next (/data/data/com.termux/files/home/common-template/node_modules/router/lib/route.js:157:13)
+    at Route.dispatch (/data/data/com.termux/files/home/common-template/node_modules/router/lib/route.js:117:3)
+    at handle (/data/data/com.termux/files/home/common-template/node_modules/router/index.js:435:11)
+    at Layer.handleRequest (/data/data/com.termux/files/home/common-template/node_modules/router/lib/layer.js:152:17)
+    at /data/data/com.termux/files/home/common-template/node_modules/router/index.js:295:15
+    at processParams (/data/data/com.termux/files/home/common-template/node_modules/router/index.js:582:12)
+    at next (/data/data/com.termux/files/home/common-template/node_modules/router/index.js:291:5)
+    at /data/data/com.termux/files/home/common-template/common.js:78:13

@@ -1,0 +1,71 @@
+{
+  "exportInfo": {
+    "exportedAt": "2025-07-24T06:11:36.967Z",
+    "appName": "money-tracker",
+    "version": "1.0",
+    "source": "Common Template System"
+  },
+  "systemLogs": [
+    {
+      "timestamp": "2025-07-24T06:09:31.251Z",
+      "appName": "money-tracker",
+      "message": "共通基盤初期化完了",
+      "data": {
+        "appName": "money-tracker"
+      },
+      "level": "info"
+    },
+    {
+      "timestamp": "2025-07-24T06:09:31.279Z",
+      "appName": "money-tracker",
+      "message": "サーバー起動",
+      "data": {
+        "port": 3001
+      },
+      "level": "info"
+    },
+    {
+      "timestamp": "2025-07-24T06:11:36.929Z",
+      "appName": "money-tracker",
+      "message": "フロントエンドページ要求",
+      "data": null,
+      "level": "info"
+    },
+    {
+      "timestamp": "2025-07-24T06:11:36.944Z",
+      "appName": "money-tracker",
+      "message": "HTTP Request",
+      "data": {
+        "method": "GET",
+        "url": "/",
+        "status": 200,
+        "duration": 17
+      },
+      "level": "info"
+    },
+    {
+      "timestamp": "2025-07-24T06:11:36.959Z",
+      "appName": "money-tracker",
+      "message": "Firebase設定要求",
+      "data": {
+        "userAgent": "Universal-Test-Toolkit/1.0"
+      },
+      "level": "info"
+    },
+    {
+      "timestamp": "2025-07-24T06:11:36.961Z",
+      "appName": "money-tracker",
+      "message": "HTTP Request",
+      "data": {
+        "method": "GET",
+        "url": "/api/firebase-config",
+        "status": 200,
+        "duration": 3
+      },
+      "level": "info"
+    }
+  ],
+  "testResults": [],
+  "userInfo": null,
+  "timestamp": 1753337496967
+}

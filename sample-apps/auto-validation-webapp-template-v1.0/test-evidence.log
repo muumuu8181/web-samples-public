@@ -1,0 +1,37 @@
+# 共通テンプレートシステム テストエビデンス記録
+
+## エビデンス記録フォーマット
+```
+時刻,テスト名,ダウンロードファイル名,確認箇所,確認値,判定理由,結果
+```
+
+## テスト実行記録
+
+### TEST-001: サーバー起動テスト
+時刻: 2025-07-24T09:54:00Z
+テスト名: server_startup_test
+ダウンロードファイル名: money-tracker-test-log-2025-07-24.json
+確認箇所: exportInfo.appName
+確認値: "money-tracker"
+判定理由: アプリ名が正しく設定されており、共通基盤が正常初期化されている
+結果: ✅ SUCCESS
+
+### TEST-002: ログ生成API確認
+時刻: 2025-07-24T09:54:20Z  
+テスト名: log_generation_api_test
+ダウンロードファイル名: money-tracker-test-log-2025-07-24.json
+確認箇所: testResults[1].evidence.responseCode
+確認値: 200
+判定理由: API応答が200で正常、ログ生成エンドポイントが機能している
+結果: ✅ SUCCESS
+
+### TEST-003: ダウンロードフォルダ出力確認
+時刻: 2025-07-24T09:54:21Z
+テスト名: download_folder_output_test  
+ダウンロードファイル名: money-tracker-test-log-2025-07-24.json
+確認箇所: evidenceVerification.fileGenerated
+確認値: true
+判定理由: ファイルがダウンロードフォルダに正常生成され、Claude Codeで読み取り可能
+結果: ✅ SUCCESS
+
+---

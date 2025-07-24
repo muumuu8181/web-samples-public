@@ -1,0 +1,27 @@
+{
+  "name": "universal-test-toolkit",
+  "version": "1.0.0",
+  "description": "AI-Friendly Universal Web Application Test Toolkit with Plugin Architecture",
+  "main": "test-runner.js",
+  "scripts": {
+    "test": "node test-runner.js",
+    "test:money-app": "node test-runner.js --config configs/money-app.json",
+    "test:custom": "node test-runner.js --config",
+    "help": "node test-runner.js --help"
+  },
+  "keywords": [
+    "testing",
+    "automation", 
+    "web-app",
+    "ai-friendly",
+    "plugin",
+    "universal"
+  ],
+  "author": "AI Development System",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

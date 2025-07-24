@@ -1,0 +1,11 @@
+{
+  "step1": false,
+  "step2": false,
+  "step3": false,
+  "step4": false,
+  "overall": false,
+  "details": {
+    "step1": "❌ サーバー接続失敗: Command failed: curl -s http://localhost:3001 -w \"%{http_code}\"\n"
+  },
+  "timestamp": "2025-07-24T02:07:50.414Z"
+}

@@ -1,0 +1,51 @@
+{
+  "exportInfo": {
+    "exportedAt": "2025-07-23T14:15:00.000Z",
+    "exportedBy": "test-user@example.com",
+    "version": "1.0",
+    "source": "Download Function Test",
+    "testPurpose": "第3原則準拠ダウンロード機能確認"
+  },
+  "systemLogs": [
+    "[14:15:01] 🚀 テストサーバー開始",
+    "[14:15:02] 📥 ログ生成API実行",
+    "[14:15:03] ✅ ダウンロード機能テスト完了",
+    "[14:15:04] 📄 JSONファイル正常生成"
+  ],
+  "testData": {
+    "message": "これはダウンロード機能のテストファイルです",
+    "features": [
+      "Express.jsサーバー基盤",
+      "ログ生成API",
+      "JSONファイル出力",
+      "Claude Code読み取り対応"
+    ],
+    "status": "success",
+    "timestamp": 1721743200000
+  },
+  "demoData": {
+    "userActions": [
+      {
+        "action": "login",
+        "timestamp": "2025-07-23T14:10:00.000Z",
+        "success": true
+      },
+      {
+        "action": "data_create",
+        "timestamp": "2025-07-23T14:12:00.000Z",
+        "data": { "amount": 1500, "category": "食費", "description": "昼食" }
+      },
+      {
+        "action": "csv_export",
+        "timestamp": "2025-07-23T14:14:00.000Z",
+        "recordCount": 5
+      }
+    ],
+    "summary": {
+      "totalActions": 3,
+      "successRate": "100%",
+      "testCompleted": true
+    }
+  },
+  "timestamp": 1721743200000
+}
