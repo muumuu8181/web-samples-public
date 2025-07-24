@@ -1,0 +1,214 @@
+{
+  "appName": "Money Management App",
+  "targetUrl": "http://localhost:3001",
+  "timeout": 15000,
+  "description": "Comprehensive test suite for money management application",
+  "testSuites": [
+    {
+      "name": "Core API Functionality",
+      "description": "Tests all essential API endpoints",
+      "tests": [
+        {
+          "name": "Server Health Check",
+          "type": "api-test",
+          "endpoint": {
+            "path": "/",
+            "method": "GET",
+            "expect": {
+              "statusCode": 200,
+              "maxResponseTime": 2000,
+              "contentType": "text/html"
+            }
+          }
+        },
+        {
+          "name": "Firebase Configuration API",
+          "type": "api-test",
+          "endpoint": {
+            "path": "/api/firebase-config",
+            "method": "GET",
+            "expect": {
+              "statusCode": 200,
+              "maxResponseTime": 3000,
+              "contentType": "application/json",
+              "jsonSchema": {
+                "required": ["apiKey", "authDomain", "databaseURL"],
+                "properties": {
+                  "apiKey": { "type": "string" },
+                  "authDomain": { "type": "string" },
+                  "databaseURL": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Test Log Generation API",
+          "type": "api-test",
+          "endpoint": {
+            "path": "/api/generate-test-log",
+            "method": "POST",
+            "expect": {
+              "statusCode": 200,
+              "maxResponseTime": 5000,
+              "contentType": "application/json",
+              "jsonSchema": {
+                "required": ["success", "fileName"],
+                "properties": {
+                  "success": { "type": "boolean" },
+                  "fileName": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Money Data Addition API",
+          "type": "api-test",
+          "endpoint": {
+            "path": "/api/money/add",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "amount": 1000,
+              "category": "テスト",
+              "description": "Test data",
+              "date": "2025-07-24"
+            },
+            "expect": {
+              "statusCode": 200,
+              "maxResponseTime": 3000,
+              "contentType": "application/json"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Web UI Components",
+      "description": "Tests user interface elements and functionality",
+      "tests": [
+        {
+          "name": "Main Page UI Structure",
+          "type": "web-ui-test",
+          "ui": {
+            "path": "/",
+            "title": "お金管理",
+            "maxLoadTime": 3000,
+            "requiredElements": [
+              { "tag": "form" },
+              { "id": "amount" },
+              { "id": "category" },
+              { "id": "description" },
+              { "class": "kanban-board" },
+              { "class": "kanban-column" }
+            ],
+            "containsText": [
+              "お金管理アプリ",
+              "金額",
+              "カテゴリ",
+              "説明",
+              "追加",
+              "Pending",
+              "In Progress", 
+              "Completed"
+            ],
+            "forms": [
+              {
+                "fields": [
+                  { "id": "amount" },
+                  { "id": "category" },
+                  { "id": "description" }
+                ]
+              }
+            ],
+            "requiresJavaScript": true
+          }
+        },
+        {
+          "name": "Firebase Integration UI",
+          "type": "web-ui-test",
+          "ui": {
+            "path": "/",
+            "containsText": [
+              "Google",
+              "ログイン",
+              "Firebase"
+            ],
+            "requiredElements": [
+              { "text": "Google でログイン" }
+            ]
+          }
+        },
+        {
+          "name": "Kanban Board Functionality",
+          "type": "web-ui-test",
+          "ui": {
+            "path": "/",
+            "containsText": [
+              "ドラッグ&ドロップでカンバンボードを操作",
+              "テストログダウンロード"
+            ],
+            "requiredElements": [
+              { "class": "kanban-item" },
+              { "text": "テストログダウンロード" }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Performance Testing",
+      "description": "Tests application performance under various conditions",
+      "tests": [
+        {
+          "name": "Single Request Performance",
+          "type": "performance-test",
+          "performance": {
+            "path": "/",
+            "loadTest": false,
+            "thresholds": {
+              "maxResponseTime": 2000,
+              "minPerformanceScore": 75
+            }
+          }
+        },
+        {
+          "name": "Load Testing",
+          "type": "performance-test",
+          "performance": {
+            "path": "/",
+            "concurrency": 3,
+            "requests": 9,
+            "thresholds": {
+              "maxResponseTime": 5000,
+              "maxFailureRate": 5,
+              "minPerformanceScore": 70
+            }
+          }
+        },
+        {
+          "name": "API Endpoint Performance",
+          "type": "performance-test",
+          "performance": {
+            "path": "/api/firebase-config",
+            "concurrency": 2,
+            "requests": 6,
+            "thresholds": {
+              "maxResponseTime": 3000,
+              "maxFailureRate": 0,
+              "minPerformanceScore": 80
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "includeDetailedErrors": true,
+    "includePerformanceMetrics": true,
+    "includeRecommendations": true
+  }
+}

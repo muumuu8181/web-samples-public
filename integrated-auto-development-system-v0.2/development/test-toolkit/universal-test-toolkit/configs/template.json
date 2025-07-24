@@ -1,0 +1,148 @@
+{
+  "appName": "Your Web Application",
+  "targetUrl": "http://localhost:3000",
+  "timeout": 15000,
+  "description": "Universal test template - customize for your application",
+  "testSuites": [
+    {
+      "name": "Basic API Tests",
+      "description": "Essential API endpoint testing",
+      "tests": [
+        {
+          "name": "Health Check",
+          "type": "api-test",
+          "endpoint": {
+            "path": "/",
+            "method": "GET",
+            "expect": {
+              "statusCode": 200,
+              "maxResponseTime": 3000
+            }
+          }
+        },
+        {
+          "name": "API Endpoint Test",
+          "type": "api-test",
+          "endpoint": {
+            "path": "/api/your-endpoint",
+            "method": "GET",
+            "expect": {
+              "statusCode": 200,
+              "maxResponseTime": 2000,
+              "contentType": "application/json"
+            }
+          }
+        },
+        {
+          "name": "POST API Test",
+          "type": "api-test",
+          "endpoint": {
+            "path": "/api/create",
+            "method": "POST",
+            "headers": {
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "name": "test",
+              "value": "sample"
+            },
+            "expect": {
+              "statusCode": 201,
+              "maxResponseTime": 3000
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "UI Component Tests",
+      "description": "User interface validation",
+      "tests": [
+        {
+          "name": "Main Page Structure",
+          "type": "web-ui-test",
+          "ui": {
+            "path": "/",
+            "title": "Your App Title",
+            "maxLoadTime": 5000,
+            "requiredElements": [
+              { "tag": "main" },
+              { "tag": "header" },
+              { "tag": "nav" }
+            ],
+            "containsText": [
+              "Welcome",
+              "Home"
+            ]
+          }
+        },
+        {
+          "name": "Form Validation",
+          "type": "web-ui-test",
+          "ui": {
+            "path": "/form",
+            "requiredElements": [
+              { "tag": "form" },
+              { "tag": "input" },
+              { "tag": "button" }
+            ],
+            "forms": [
+              {
+                "name": "main-form",
+                "fields": [
+                  { "tag": "input" }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Performance Benchmarks",
+      "description": "Application performance testing",
+      "tests": [
+        {
+          "name": "Single Request Speed",
+          "type": "performance-test",
+          "performance": {
+            "path": "/",
+            "loadTest": false,
+            "thresholds": {
+              "maxResponseTime": 3000,
+              "minPerformanceScore": 70
+            }
+          }
+        },
+        {
+          "name": "Concurrent Load Test",
+          "type": "performance-test",
+          "performance": {
+            "path": "/",
+            "concurrency": 5,
+            "requests": 15,
+            "thresholds": {
+              "maxResponseTime": 5000,
+              "maxFailureRate": 10,
+              "minPerformanceScore": 60
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "reporting": {
+    "includeDetailedErrors": true,
+    "includePerformanceMetrics": true,
+    "includeRecommendations": true
+  },
+  "_instructions": {
+    "appName": "Replace with your application name",
+    "targetUrl": "Change to your application URL",
+    "testSuites": "Customize test suites for your application",
+    "paths": "Update API paths to match your endpoints",
+    "ui.requiredElements": "Specify elements that must exist in your pages",
+    "ui.containsText": "Text that should appear on your pages",
+    "thresholds": "Adjust performance thresholds based on your requirements"
+  }
+}

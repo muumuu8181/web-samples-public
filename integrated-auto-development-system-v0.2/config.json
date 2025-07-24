@@ -1,0 +1,126 @@
+{
+  "version": "1.0",
+  "appName": "SmartPersonalManager",
+  "features": {
+    "firebaseAuth": true,
+    "realtimeDatabase": true,
+    "csvExport": true,
+    "jsonLogs": true,
+    "moduleLoader": true,
+    "debugMode": true,
+    "advancedAnalytics": false
+  },
+  "ui": {
+    "theme": "default",
+    "compactMode": false,
+    "showNavigationTabs": true,
+    "defaultApp": "money"
+  },
+  "server": {
+    "cors": true,
+    "rateLimiting": false,
+    "port": 3001
+  },
+  "description": "統合アプリ管理システム",
+  "enabledApps": [
+    "money",
+    "weight",
+    "memo",
+    "calc",
+    "sleep"
+  ],
+  "firebase": {
+    "apiKey": "AIzaSyA5PXKChizYDCXF_GJ4KL6Ylq9K5hCPXWE",
+    "authDomain": "shares-b1b97.firebaseapp.com",
+    "databaseURL": "https://shares-b1b97-default-rtdb.firebaseio.com",
+    "projectId": "shares-b1b97",
+    "storageBucket": "shares-b1b97.appspot.com",
+    "messagingSenderId": "927474832426",
+    "appId": "1:927474832426:web:8a8d8d8d8d8d8d8d8d8d8d"
+  },
+  "apps": {
+    "money": {
+      "name": "お金管理",
+      "description": "収入・支出の管理とレポート",
+      "icon": "💰",
+      "categories": [
+        "食費",
+        "交通費",
+        "娯楽費",
+        "光熱費",
+        "家賃",
+        "医療費",
+        "教育費",
+        "その他支出",
+        "給与",
+        "副業",
+        "ボーナス",
+        "その他収入"
+      ]
+    },
+    "time": {
+      "name": "時間管理",
+      "description": "作業時間の記録と分析",
+      "icon": "⏰",
+      "categories": [
+        "作業",
+        "勉強",
+        "会議",
+        "休憩",
+        "移動",
+        "運動",
+        "読書",
+        "その他"
+      ]
+    },
+    "weight": {
+      "name": "体重管理",
+      "description": "体重・体脂肪率の記録と推移",
+      "icon": "⚖️",
+      "categories": [
+        "体重",
+        "体脂肪率",
+        "筋肉量",
+        "BMI",
+        "血圧",
+        "その他"
+      ]
+    },
+    "memo": {
+      "name": "メモ管理",
+      "description": "メモ・ノートの作成と管理",
+      "icon": "📝",
+      "categories": [
+        "仕事",
+        "プライベート",
+        "学習",
+        "アイデア",
+        "その他"
+      ]
+    },
+    "calc": {
+      "name": "計算機",
+      "description": "シンプルな数値計算と履歴管理",
+      "icon": "🧮",
+      "categories": [
+        "足し算",
+        "引き算",
+        "掛け算",
+        "割り算"
+      ]
+    },
+    "sleep": {
+      "name": "睡眠管理",
+      "description": "睡眠パターンの記録・分析・品質管理",
+      "icon": "💤",
+      "categories": [
+        "就寝時刻",
+        "起床時刻",
+        "睡眠時間",
+        "睡眠品質",
+        "夢の記録",
+        "環境要因"
+      ]
+    }
+  }
+}

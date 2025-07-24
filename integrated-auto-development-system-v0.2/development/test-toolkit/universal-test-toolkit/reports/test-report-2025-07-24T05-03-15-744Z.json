@@ -1,0 +1,925 @@
+{
+  "metadata": {
+    "generatedAt": "2025-07-24T05:03:15.745Z",
+    "toolkitVersion": "1.0.0",
+    "configFile": "unknown",
+    "executionId": "exec_1753333395745_ya2wvt74k"
+  },
+  "application": {
+    "name": "Money Management App",
+    "targetUrl": "http://localhost:3001",
+    "testDuration": 276
+  },
+  "summary": {
+    "totalTests": 10,
+    "passed": 6,
+    "failed": 4,
+    "warnings": 0,
+    "successRate": 60,
+    "pluginsExecuted": 3,
+    "endpointsTested": 4,
+    "uiComponentsTested": 3
+  },
+  "testSuites": [
+    {
+      "name": "Core API Functionality",
+      "description": "Tests all essential API endpoints",
+      "startTime": "2025-07-24T05:03:15.515Z",
+      "tests": [
+        {
+          "name": "Server Health Check",
+          "type": "api-test",
+          "startTime": "2025-07-24T05:03:15.516Z",
+          "status": "passed",
+          "message": "API endpoint responded successfully (200, 52ms)",
+          "data": {
+            "method": "GET",
+            "url": "http://localhost:3001/",
+            "statusCode": 200,
+            "responseTime": 52,
+            "contentType": "text/html; charset=utf-8",
+            "responseSize": 35333
+          },
+          "errors": [],
+          "endTime": "2025-07-24T05:03:15.573Z"
+        },
+        {
+          "name": "Firebase Configuration API",
+          "type": "api-test",
+          "startTime": "2025-07-24T05:03:15.573Z",
+          "status": "failed",
+          "message": "API test failed with 1 error(s): json_schema_validation",
+          "data": {
+            "method": "GET",
+            "url": "http://localhost:3001/api/firebase-config",
+            "statusCode": 200,
+            "responseTime": 9,
+            "contentType": "application/json; charset=utf-8",
+            "responseSize": 381
+          },
+          "errors": [
+            {
+              "type": "json_schema_validation",
+              "errors": [
+                "Missing required field: apiKey",
+                "Missing required field: authDomain",
+                "Missing required field: databaseURL"
+              ]
+            }
+          ],
+          "endTime": "2025-07-24T05:03:15.583Z"
+        },
+        {
+          "name": "Test Log Generation API",
+          "type": "api-test",
+          "startTime": "2025-07-24T05:03:15.584Z",
+          "status": "passed",
+          "message": "API endpoint responded successfully (200, 23ms)",
+          "data": {
+            "method": "POST",
+            "url": "http://localhost:3001/api/generate-test-log",
+            "statusCode": 200,
+            "responseTime": 23,
+            "contentType": "application/json; charset=utf-8",
+            "responseSize": 309
+          },
+          "errors": [],
+          "endTime": "2025-07-24T05:03:15.608Z"
+        },
+        {
+          "name": "Money Data Addition API",
+          "type": "api-test",
+          "startTime": "2025-07-24T05:03:15.608Z",
+          "status": "passed",
+          "message": "API endpoint responded successfully (200, 6ms)",
+          "data": {
+            "method": "POST",
+            "url": "http://localhost:3001/api/money/add",
+            "statusCode": 200,
+            "responseTime": 6,
+            "contentType": "application/json; charset=utf-8",
+            "responseSize": 174
+          },
+          "errors": [],
+          "endTime": "2025-07-24T05:03:15.614Z"
+        }
+      ],
+      "summary": {
+        "total": 4,
+        "passed": 3,
+        "failed": 1,
+        "warnings": 0
+      },
+      "endTime": "2025-07-24T05:03:15.614Z"
+    },
+    {
+      "name": "Web UI Components",
+      "description": "Tests user interface elements and functionality",
+      "startTime": "2025-07-24T05:03:15.615Z",
+      "tests": [
+        {
+          "name": "Main Page UI Structure",
+          "type": "web-ui-test",
+          "startTime": "2025-07-24T05:03:15.615Z",
+          "status": "failed",
+          "message": "UI test failed with 3 error(s): missing_text, missing_text, missing_text",
+          "data": {
+            "url": "http://localhost:3001/",
+            "statusCode": 200,
+            "responseTime": 8,
+            "contentType": "text/html; charset=utf-8",
+            "pageSize": 35333,
+            "elementsFound": 86,
+            "scriptsFound": 4,
+            "stylesFound": 1
+          },
+          "errors": [
+            {
+              "type": "missing_text",
+              "expected": "Pending",
+              "message": "Page does not contain required text: Pending"
+            },
+            {
+              "type": "missing_text",
+              "expected": "In Progress",
+              "message": "Page does not contain required text: In Progress"
+            },
+            {
+              "type": "missing_text",
+              "expected": "Completed",
+              "message": "Page does not contain required text: Completed"
+            }
+          ],
+          "endTime": "2025-07-24T05:03:15.627Z"
+        },
+        {
+          "name": "Firebase Integration UI",
+          "type": "web-ui-test",
+          "startTime": "2025-07-24T05:03:15.628Z",
+          "status": "failed",
+          "message": "UI test failed with 1 error(s): missing_element",
+          "data": {
+            "url": "http://localhost:3001/",
+            "statusCode": 200,
+            "responseTime": 5,
+            "contentType": "text/html; charset=utf-8",
+            "pageSize": 35333,
+            "elementsFound": 86,
+            "scriptsFound": 4,
+            "stylesFound": 1
+          },
+          "errors": [
+            {
+              "type": "missing_element",
+              "element": {
+                "text": "Google でログイン"
+              },
+              "message": "Required element not found: [object Object]"
+            }
+          ],
+          "endTime": "2025-07-24T05:03:15.633Z"
+        },
+        {
+          "name": "Kanban Board Functionality",
+          "type": "web-ui-test",
+          "startTime": "2025-07-24T05:03:15.634Z",
+          "status": "failed",
+          "message": "UI test failed with 3 error(s): missing_element, missing_text, missing_text",
+          "data": {
+            "url": "http://localhost:3001/",
+            "statusCode": 200,
+            "responseTime": 6,
+            "contentType": "text/html; charset=utf-8",
+            "pageSize": 35333,
+            "elementsFound": 86,
+            "scriptsFound": 4,
+            "stylesFound": 1
+          },
+          "errors": [
+            {
+              "type": "missing_element",
+              "element": {
+                "text": "テストログダウンロード"
+              },
+              "message": "Required element not found: [object Object]"
+            },
+            {
+              "type": "missing_text",
+              "expected": "ドラッグ&ドロップでカンバンボードを操作",
+              "message": "Page does not contain required text: ドラッグ&ドロップでカンバンボードを操作"
+            },
+            {
+              "type": "missing_text",
+              "expected": "テストログダウンロード",
+              "message": "Page does not contain required text: テストログダウンロード"
+            }
+          ],
+          "endTime": "2025-07-24T05:03:15.641Z"
+        }
+      ],
+      "summary": {
+        "total": 3,
+        "passed": 0,
+        "failed": 3,
+        "warnings": 0
+      },
+      "endTime": "2025-07-24T05:03:15.641Z"
+    },
+    {
+      "name": "Performance Testing",
+      "description": "Tests application performance under various conditions",
+      "startTime": "2025-07-24T05:03:15.641Z",
+      "tests": [
+        {
+          "name": "Single Request Performance",
+          "type": "performance-test",
+          "startTime": "2025-07-24T05:03:15.641Z",
+          "status": "passed",
+          "message": "Performance test passed (Score: 100/100, Response: 7.4ms)",
+          "data": {
+            "url": "http://localhost:3001/",
+            "timestamp": "2025-07-24T05:03:15.643Z",
+            "singleRequest": {
+              "success": true,
+              "responseTime": 7.4,
+              "statusCode": 200,
+              "contentLength": 35333,
+              "headers": {
+                "x-powered-by": "Express",
+                "access-control-allow-origin": "*",
+                "access-control-allow-headers": "Content-Type, Authorization",
+                "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                "content-type": "text/html; charset=utf-8",
+                "content-length": "38079",
+                "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                "connection": "keep-alive",
+                "keep-alive": "timeout=5"
+              },
+              "memoryDelta": {
+                "rss": 253952,
+                "heapUsed": 643560,
+                "heapTotal": 0
+              },
+              "timing": {
+                "start": "1970-01-02T13:55:51.544Z",
+                "end": "1970-01-02T13:55:51.552Z"
+              }
+            },
+            "loadTest": {},
+            "resourceAnalysis": {
+              "resourceCounts": {
+                "scripts": 3,
+                "stylesheets": 0,
+                "images": 0,
+                "total": 3
+              },
+              "estimatedSizes": {
+                "html": 35333,
+                "scripts": 150000,
+                "stylesheets": 0,
+                "images": 0,
+                "total": 185333
+              },
+              "resources": {
+                "scripts": [
+                  "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js",
+                  "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js",
+                  "https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"
+                ],
+                "stylesheets": [],
+                "images": []
+              }
+            },
+            "overview": {
+              "overallScore": 100,
+              "recommendations": [],
+              "summary": {
+                "responseTime": 7.4,
+                "resourceCount": 3,
+                "loadTestSuccess": 0,
+                "loadTestFailed": 0,
+                "estimatedPageSize": 185333
+              }
+            }
+          },
+          "errors": [],
+          "endTime": "2025-07-24T05:03:15.662Z"
+        },
+        {
+          "name": "Load Testing",
+          "type": "performance-test",
+          "startTime": "2025-07-24T05:03:15.662Z",
+          "status": "passed",
+          "message": "Performance test passed (Score: 100/100, Response: 8.18ms)",
+          "data": {
+            "url": "http://localhost:3001/",
+            "timestamp": "2025-07-24T05:03:15.663Z",
+            "singleRequest": {
+              "success": true,
+              "responseTime": 8.18,
+              "statusCode": 200,
+              "contentLength": 35333,
+              "headers": {
+                "x-powered-by": "Express",
+                "access-control-allow-origin": "*",
+                "access-control-allow-headers": "Content-Type, Authorization",
+                "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                "content-type": "text/html; charset=utf-8",
+                "content-length": "38079",
+                "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                "connection": "keep-alive",
+                "keep-alive": "timeout=5"
+              },
+              "memoryDelta": {
+                "rss": 90112,
+                "heapUsed": -500400,
+                "heapTotal": 0
+              },
+              "timing": {
+                "start": "1970-01-02T13:55:51.563Z",
+                "end": "1970-01-02T13:55:51.571Z"
+              }
+            },
+            "loadTest": {
+              "totalRequests": 9,
+              "concurrency": 3,
+              "successful": 9,
+              "failed": 0,
+              "totalTime": 39,
+              "requestsPerSecond": 230.77,
+              "averageResponseTime": 9.71,
+              "minResponseTime": 5.89,
+              "maxResponseTime": 15.85,
+              "failureRate": 0,
+              "results": [
+                {
+                  "success": true,
+                  "responseTime": 9.4,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 249856,
+                    "heapUsed": 158568,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.572Z",
+                    "end": "1970-01-02T13:55:51.581Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 13.35,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 516096,
+                    "heapUsed": 236488,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.573Z",
+                    "end": "1970-01-02T13:55:51.586Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 15.85,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 729088,
+                    "heapUsed": -346088,
+                    "heapTotal": 524288
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.574Z",
+                    "end": "1970-01-02T13:55:51.589Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 5.89,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 49152,
+                    "heapUsed": -177472,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.590Z",
+                    "end": "1970-01-02T13:55:51.596Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 7.53,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 49152,
+                    "heapUsed": -102608,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.590Z",
+                    "end": "1970-01-02T13:55:51.598Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 9.32,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 315392,
+                    "heapUsed": 326416,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.591Z",
+                    "end": "1970-01-02T13:55:51.600Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 7.69,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 0,
+                    "heapUsed": 128336,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.600Z",
+                    "end": "1970-01-02T13:55:51.608Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 8.6,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 270336,
+                    "heapUsed": 250032,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.601Z",
+                    "end": "1970-01-02T13:55:51.609Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 9.77,
+                  "statusCode": 200,
+                  "contentLength": 35333,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "text/html; charset=utf-8",
+                    "content-length": "38079",
+                    "etag": "W/\"94bf-zJfUDV30L5UXK5ilbbFXDmztY9U\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 270336,
+                    "heapUsed": 335200,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.601Z",
+                    "end": "1970-01-02T13:55:51.611Z"
+                  }
+                }
+              ]
+            },
+            "resourceAnalysis": {
+              "resourceCounts": {
+                "scripts": 3,
+                "stylesheets": 0,
+                "images": 0,
+                "total": 3
+              },
+              "estimatedSizes": {
+                "html": 35333,
+                "scripts": 150000,
+                "stylesheets": 0,
+                "images": 0,
+                "total": 185333
+              },
+              "resources": {
+                "scripts": [
+                  "https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js",
+                  "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js",
+                  "https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"
+                ],
+                "stylesheets": [],
+                "images": []
+              }
+            },
+            "overview": {
+              "overallScore": 100,
+              "recommendations": [],
+              "summary": {
+                "responseTime": 8.18,
+                "resourceCount": 3,
+                "loadTestSuccess": 9,
+                "loadTestFailed": 0,
+                "estimatedPageSize": 185333
+              }
+            }
+          },
+          "errors": [],
+          "endTime": "2025-07-24T05:03:15.716Z"
+        },
+        {
+          "name": "API Endpoint Performance",
+          "type": "performance-test",
+          "startTime": "2025-07-24T05:03:15.716Z",
+          "status": "passed",
+          "message": "Performance test passed (Score: 100/100, Response: 4.75ms)",
+          "data": {
+            "url": "http://localhost:3001/api/firebase-config",
+            "timestamp": "2025-07-24T05:03:15.716Z",
+            "singleRequest": {
+              "success": true,
+              "responseTime": 4.75,
+              "statusCode": 200,
+              "contentLength": 381,
+              "headers": {
+                "x-powered-by": "Express",
+                "access-control-allow-origin": "*",
+                "access-control-allow-headers": "Content-Type, Authorization",
+                "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                "content-type": "application/json; charset=utf-8",
+                "content-length": "381",
+                "etag": "W/\"17d-+NDW9rD3W4ynpGNTuE4x8bLrukI\"",
+                "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                "connection": "keep-alive",
+                "keep-alive": "timeout=5"
+              },
+              "memoryDelta": {
+                "rss": 0,
+                "heapUsed": 29904,
+                "heapTotal": 0
+              },
+              "timing": {
+                "start": "1970-01-02T13:55:51.617Z",
+                "end": "1970-01-02T13:55:51.622Z"
+              }
+            },
+            "loadTest": {
+              "totalRequests": 6,
+              "concurrency": 2,
+              "successful": 6,
+              "failed": 0,
+              "totalTime": 17,
+              "requestsPerSecond": 352.94,
+              "averageResponseTime": 4.51,
+              "minResponseTime": 3.66,
+              "maxResponseTime": 5.45,
+              "failureRate": 0,
+              "results": [
+                {
+                  "success": true,
+                  "responseTime": 4.46,
+                  "statusCode": 200,
+                  "contentLength": 381,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "application/json; charset=utf-8",
+                    "content-length": "381",
+                    "etag": "W/\"17d-+NDW9rD3W4ynpGNTuE4x8bLrukI\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": -49152,
+                    "heapUsed": 44688,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.622Z",
+                    "end": "1970-01-02T13:55:51.626Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 5.45,
+                  "statusCode": 200,
+                  "contentLength": 381,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "application/json; charset=utf-8",
+                    "content-length": "381",
+                    "etag": "W/\"17d-+NDW9rD3W4ynpGNTuE4x8bLrukI\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": -49152,
+                    "heapUsed": 49672,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.622Z",
+                    "end": "1970-01-02T13:55:51.628Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 3.85,
+                  "statusCode": 200,
+                  "contentLength": 381,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "application/json; charset=utf-8",
+                    "content-length": "381",
+                    "etag": "W/\"17d-+NDW9rD3W4ynpGNTuE4x8bLrukI\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 0,
+                    "heapUsed": 43488,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.628Z",
+                    "end": "1970-01-02T13:55:51.632Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 4.97,
+                  "statusCode": 200,
+                  "contentLength": 381,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "application/json; charset=utf-8",
+                    "content-length": "381",
+                    "etag": "W/\"17d-+NDW9rD3W4ynpGNTuE4x8bLrukI\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 0,
+                    "heapUsed": 48312,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.629Z",
+                    "end": "1970-01-02T13:55:51.634Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 3.66,
+                  "statusCode": 200,
+                  "contentLength": 381,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "application/json; charset=utf-8",
+                    "content-length": "381",
+                    "etag": "W/\"17d-+NDW9rD3W4ynpGNTuE4x8bLrukI\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 0,
+                    "heapUsed": 43520,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.634Z",
+                    "end": "1970-01-02T13:55:51.637Z"
+                  }
+                },
+                {
+                  "success": true,
+                  "responseTime": 4.66,
+                  "statusCode": 200,
+                  "contentLength": 381,
+                  "headers": {
+                    "x-powered-by": "Express",
+                    "access-control-allow-origin": "*",
+                    "access-control-allow-headers": "Content-Type, Authorization",
+                    "access-control-allow-methods": "GET, POST, PUT, DELETE",
+                    "content-type": "application/json; charset=utf-8",
+                    "content-length": "381",
+                    "etag": "W/\"17d-+NDW9rD3W4ynpGNTuE4x8bLrukI\"",
+                    "date": "Thu, 24 Jul 2025 05:03:15 GMT",
+                    "connection": "keep-alive",
+                    "keep-alive": "timeout=5"
+                  },
+                  "memoryDelta": {
+                    "rss": 0,
+                    "heapUsed": 48504,
+                    "heapTotal": 0
+                  },
+                  "timing": {
+                    "start": "1970-01-02T13:55:51.634Z",
+                    "end": "1970-01-02T13:55:51.639Z"
+                  }
+                }
+              ]
+            },
+            "resourceAnalysis": {
+              "resourceCounts": {
+                "scripts": 0,
+                "stylesheets": 0,
+                "images": 0,
+                "total": 0
+              },
+              "estimatedSizes": {
+                "html": 381,
+                "scripts": 0,
+                "stylesheets": 0,
+                "images": 0,
+                "total": 381
+              },
+              "resources": {
+                "scripts": [],
+                "stylesheets": [],
+                "images": []
+              }
+            },
+            "overview": {
+              "overallScore": 100,
+              "recommendations": [],
+              "summary": {
+                "responseTime": 4.75,
+                "resourceCount": 0,
+                "loadTestSuccess": 6,
+                "loadTestFailed": 0,
+                "estimatedPageSize": 381
+              }
+            }
+          },
+          "errors": [],
+          "endTime": "2025-07-24T05:03:15.743Z"
+        }
+      ],
+      "summary": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "warnings": 0
+      },
+      "endTime": "2025-07-24T05:03:15.743Z"
+    }
+  ],
+  "insights": [
+    {
+      "type": "critical",
+      "message": "Application health needs attention",
+      "detail": "Only 60.0% of tests passed, 4 tests failed"
+    },
+    {
+      "type": "info",
+      "message": "Comprehensive testing coverage achieved",
+      "detail": "3 different test types executed"
+    },
+    {
+      "type": "analysis",
+      "message": "Failure patterns identified",
+      "detail": "1 api-test failure(s), 3 web-ui-test failure(s)"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "reliability",
+      "action": "Fix failing tests",
+      "detail": "Address 4 failing tests to improve application stability"
+    }
+  ],
+  "filePath": "/data/data/com.termux/files/home/universal-test-toolkit/reports/test-report-2025-07-24T05-03-15-744Z.json",
+  "fileName": "test-report-2025-07-24T05-03-15-744Z.json"
+}
