@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "description": "許可されたアプリモジュールのホワイトリスト",
+  "lastUpdated": "2025-07-24T14:10:00.000Z",
+  "allowedApps": [
+    "money",
+    "time", 
+    "weight",
+    "health",
+    "todo",
+    "note",
+    "memo",
+    "calc",
+    "sleep",
+    "clothes"
+  ],
+  "comments": {
+    "money": "お金管理アプリ",
+    "time": "時間管理アプリ", 
+    "weight": "体重管理アプリ",
+    "health": "健康管理アプリ（将来用）",
+    "todo": "TODO管理アプリ（将来用）",
+    "note": "ノート管理アプリ（将来用）",
+    "memo": "メモ管理アプリ",
+    "calc": "計算機アプリ",
+    "sleep": "睡眠管理アプリ - AI自動開発実装",
+    "clothes": "服の管理アプリ - 衣類の種類・色・季節・サイズ・数量管理"
+  },
+  "security": {
+    "whitelistOnly": true,
+    "preventPathTraversal": true,
+    "maxApps": 20
+  }
+}
