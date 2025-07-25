@@ -1,0 +1,39 @@
+{
+  "step1": true,
+  "step2": true,
+  "step3": true,
+  "step4": true,
+  "overall": true,
+  "details": {
+    "step1": "✅ サーバー起動確認済み (HTTP: 200)",
+    "step2": "✅ API実行成功: test-download-2025-07-24.json",
+    "step3": "✅ ファイル生成確認: 458バイト",
+    "step4": "✅ AI読み取り可能・構造正常"
+  },
+  "timestamp": "2025-07-24T22:18:05.804Z",
+  "generatedFile": "/mnt/c/Users/user/common-template/logs/test-download-2025-07-24.json",
+  "evidence": {
+    "fileName": "test-download-2025-07-24.json",
+    "totalLines": 19,
+    "keyEvidence": [
+      {
+        "lineNumber": 4,
+        "content": "\"exportedAt\": \"2025-07-24T22:18:05.854Z\",",
+        "significance": "エクスポート時刻の記録確認",
+        "category": "timestamp"
+      },
+      {
+        "lineNumber": 6,
+        "content": "\"testPurpose\": \"第三者による動作確認の証跡\"",
+        "significance": "テスト目的の明記確認",
+        "category": "purpose"
+      },
+      {
+        "lineNumber": 9,
+        "content": "\"success\": true,",
+        "significance": "success判定の確認",
+        "category": "critical"
+      }
+    ]
+  }
+}

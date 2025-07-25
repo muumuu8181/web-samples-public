@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 統合アプリ管理システム v1.0</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #2196F3;
+            --warning: #FF9800;
+            --danger: #f44336;
+            --success: #4CAF50;
+            --bg: #f8f9fa;
+            --surface: #fff;
+            --text: #333;
+            --text-light: #666;
+            --border: #ddd;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ヘッダー */
+        header {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .version-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: normal;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .auth-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+
+        .auth-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* アプリタブ */
+        .app-tabs {
+            display: flex;
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .app-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-light);
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .app-tab:hover {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .app-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: var(--bg);
+        }
+
+        .app-tab .icon {
+            font-size: 1.2rem;
+        }
+
+        /* メインコンテンツ */
+        .main-content {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            min-height: 500px;
+        }
+
+        .app-content {
+            display: none;
+            padding: 20px;
+        }
+
+        .app-content.active {
+            display: block;
+        }
+
+        .welcome-content {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .welcome-content h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .welcome-content p {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        /* システム情報 */
+        .system-info {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-card {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-card h4 {
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .info-card p {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ボタン */
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: opacity 0.3s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        /* ログセクション */
+        .log-section {
+            margin-top: 20px;
+        }
+
+        .log-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .debug-logs {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-line;
+        }
+
+        /* 設定パネル */
+        .settings-panel {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+
+        /* お金管理画面 */
+        .money-panel {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .input-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .form-control {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        .transaction-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .transactions-display {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-income {
+            border-left: 4px solid var(--success);
+        }
+
+        .transaction-expense {
+            border-left: 4px solid var(--danger);
+        }
+
+        /* 時間管理・体重管理画面 */
+        .time-panel, .weight-panel {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timer-section, .bmi-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .timer-display, .bmi-display {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
+        .timer-clock {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-controls {
+            margin: 15px 0;
+        }
+
+        .timer-task {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .bmi-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bmi-status {
+            font-size: 1.2rem;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .bmi-underweight { background: #e3f2fd; color: #1976d2; }
+        .bmi-normal { background: #e8f5e8; color: #388e3c; }
+        .bmi-overweight { background: #fff3e0; color: #f57c00; }
+        .bmi-obese { background: #ffebee; color: #d32f2f; }
+
+        .time-list, .weight-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .records-display {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .record-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .record-item:last-child {
+            border-bottom: none;
+        }
+
+        .record-work { border-left: 4px solid #2196F3; }
+        .record-study { border-left: 4px solid #4CAF50; }
+        .record-exercise { border-left: 4px solid #FF9800; }
+        .record-break { border-left: 4px solid #9C27B0; }
+        .record-other { border-left: 4px solid #607D8B; }
+
+        /* メモ管理画面 */
+        .memo-panel {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .memo-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .memo-display {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .memo-item {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .memo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .memo-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .memo-category {
+            background: var(--primary);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .memo-content {
+            margin: 10px 0;
+            line-height: 1.5;
+            color: #555;
+            white-space: pre-wrap;
+        }
+
+        .memo-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .memo-tags {
+            display: flex;
+            gap: 5px;
+        }
+
+        .memo-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+
+        .memo-delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .memo-delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        /* 計算機スタイル */
+        .calc-form {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .calc-input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .calc-input {
+            width: 120px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .calc-operator, .calc-equals {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary);
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .calc-result {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--success);
+            min-width: 100px;
+            background: var(--bg);
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: 2px solid var(--success);
+            text-align: center;
+        }
+
+        .calc-button-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .calc-btn {
+            background: var(--primary);
+            font-size: 16px;
+            font-weight: bold;
+            min-width: 120px;
+        }
+
+        .calc-history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--surface);
+        }
+
+        .calc-history-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calc-history-item:last-child {
+            border-bottom: none;
+        }
+
+        .calc-history-item:hover {
+            background: var(--bg);
+        }
+
+        .calc-expression {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .calc-timestamp {
+            color: var(--text-light);
+            font-size: 12px;
+        }
+
+        .calc-delete-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .calc-delete-btn:hover {
+            opacity: 0.8;
+        }
+
+        .config-editor {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            width: 100%;
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        /* 設定管理UI */
+        .config-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: var(--bg);
+            transition: background-color 0.2s;
+        }
+
+        .checkbox-item:hover {
+            background: #f0f0f0;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin: 0;
+            transform: scale(1.1);
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            font-weight: normal;
+        }
+
+        .checkbox-item.enabled {
+            background: #e8f5e8;
+            border-color: var(--success);
+        }
+
+        .app-icon {
+            font-size: 16px;
+            margin-right: 4px;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .app-tabs {
+                flex-direction: column;
+            }
+            
+            .app-tab {
+                justify-content: center;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ローディング */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ステータス表示 */
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .status-success {
+            background: #e8f5e8;
+            color: #2e7d2e;
+        }
+
+        .status-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* ログ閲覧画面 */
+        .logs-panel {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .log-selection, .log-search, .log-content {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg);
+            border-radius: 6px;
+        }
+
+        .log-controls, .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .log-display {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            padding: 15px;
+            border-radius: 4px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            border: 1px solid #333;
+        }
+
+        .log-line {
+            padding: 2px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .log-line:last-child {
+            border-bottom: none;
+        }
+
+        .log-line.highlight {
+            background: #264f78;
+            color: #ffffff;
+        }
+
+        .log-header {
+            background: #2d4a5a !important;
+            color: #87ceeb !important;
+            font-weight: bold;
+            border: none !important;
+        }
+
+        .file-name {
+            color: #87ceeb;
+            font-size: 0.9rem;
+            font-weight: normal;
+            opacity: 0.8;
+        }
+
+        .search-count {
+            color: var(--primary);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヘッダー -->
+        <header>
+            <h1>
+                🚀 統合アプリ管理システム
+                <span class="version-badge">v0.3</span>
+            </h1>
+            <div class="user-info" id="userInfo">
+                <div class="status" id="connectionStatus">
+                    <span class="loading"></span>
+                    <span>接続中...</span>
+                </div>
+                <button class="auth-btn" id="authBtn">Googleでログイン</button>
+            </div>
+        </header>
+
+        <!-- システム情報 -->
+        <div class="system-info">
+            <h3>📊 システム情報</h3>
+            <div class="info-grid" id="systemInfo">
+                <div class="info-card">
+                    <h4>バージョン</h4>
+                    <p id="version">0.3</p>
+                </div>
+                <div class="info-card">
+                    <h4>有効アプリ数</h4>
+                    <p id="enabledApps">読み込み中...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- アプリタブ -->
+        <div class="app-tabs" id="appTabs">
+            <button class="app-tab active" data-app="simple">
+                <span class="icon">📄</span>
+                <span>シンプル</span>
+            </button>
+            <button class="app-tab" data-app="settings">
+                <span class="icon">⚙️</span>
+                <span>設定</span>
+            </button>
+            <button class="app-tab" data-app="logs">
+                <span class="icon">📋</span>
+                <span>ログ</span>
+            </button>
+        </div>
+
+        <!-- メインコンテンツ -->
+        <div class="main-content">
+            <!-- シンプルサンプルアプリ画面 -->
+            <div class="app-content active" id="simple-content">
+                <!-- 動的に読み込まれる -->
+            </div>
+
+            <!-- 設定画面 -->
+            <div class="app-content" id="settings-content">
+                <div class="settings-panel">
+                    <h3>⚙️ 設定管理</h3>
+                    <p>config.json の内容を編集できます。変更後は「設定を保存」をクリックしてください。</p>
+                    
+                    <!-- アプリ有効化設定 -->
+                    <div class="config-section">
+                        <h4>📱 有効なアプリ</h4>
+                        <div class="checkbox-list" id="enabledAppsCheckboxes">
+                            <div class="loading">設定を読み込み中...</div>
+                        </div>
+                    </div>
+
+                    <!-- 機能設定 -->
+                    <div class="config-section">
+                        <h4>⚙️ 機能設定</h4>
+                        <div class="checkbox-list" id="featuresCheckboxes">
+                            <div class="loading">設定を読み込み中...</div>
+                        </div>
+                    </div>
+
+                    <!-- 保存・リセットボタン -->
+                    <div style="margin: 20px 0;">
+                        <button class="btn" onclick="loadConfigUI()">📥 設定読み込み</button>
+                        <button class="btn btn-secondary" onclick="saveConfigUI()">💾 設定保存</button>
+                        <button class="btn btn-warning" onclick="resetConfig()">🔄 リセット</button>
+                    </div>
+                    
+                    <!-- 高度な設定（JSON編集） -->
+                    <div class="config-section">
+                        <h4>🔧 高度な設定 (JSON)</h4>
+                        <details>
+                            <summary>エンジニア向け設定編集</summary>
+                            <textarea class="config-editor" id="configEditor" placeholder="設定を読み込み中..."></textarea>
+                            <div style="margin-top: 10px;">
+                                <button class="btn btn-secondary" onclick="loadConfig()">📥 JSON読み込み</button>
+                                <button class="btn btn-secondary" onclick="saveConfig()">💾 JSON保存</button>
+                            </div>
+                        </details>
+                    </div>
+                    
+                    <div style="margin-top: 15px;">
+                        <div class="status status-warning">
+                            <span>⚠️</span>
+                            <span>設定変更後はサーバーの再起動が必要です</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ログ閲覧画面 -->
+            <div class="app-content" id="logs-content">
+                <div class="logs-panel">
+                    <h3>📋 ログ閲覧</h3>
+                    <p>システムからダウンロードされた過去のログを閲覧・検索できます。</p>
+                    
+                    <!-- ログファイル選択 -->
+                    <div class="log-selection">
+                        <h4>📁 ログファイル一覧</h4>
+                        <div class="log-controls">
+                            <button class="btn" onclick="loadLogFiles()">🔄 リスト更新</button>
+                            <button class="btn btn-secondary" onclick="loadAllLogs()">📚 全ログ一括表示</button>
+                            <select id="logFileSelect" class="form-control" onchange="loadSelectedLog()">
+                                <option value="">個別ファイルを選択</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- 検索フィルター -->
+                    <div class="log-search">
+                        <h4>🔍 検索・フィルター</h4>
+                        <div class="search-controls">
+                            <input type="text" id="logSearchInput" class="form-control" placeholder="キーワードで検索..." oninput="filterLogLines()">
+                            <button class="btn btn-secondary" onclick="clearLogSearch()">🗑️ クリア</button>
+                            <span id="searchResultCount" class="search-count">0件</span>
+                        </div>
+                    </div>
+                    
+                    <!-- ログ内容表示 -->
+                    <div class="log-content">
+                        <h4>📄 ログ内容</h4>
+                        <div id="logDisplay" class="log-display">
+                            ログファイルを選択してください
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 動的アプリコンテンツがここに追加される -->
+    </script>
+</body>
+</html>

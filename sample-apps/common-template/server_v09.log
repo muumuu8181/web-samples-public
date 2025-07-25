@@ -1,0 +1,23 @@
+[2025/7/25 10:12:43] [2025/7/25 10:12:43] 🔧 ModuleLoader | 📋 設定読み込み完了 | バージョン: 0.9
+[2025/7/25 10:12:43] [2025/7/25 10:12:43] 🔧 ModuleLoader | 📋 許可アプリリスト読み込み完了 | 9個のアプリが許可されています
+[2025/7/25 10:12:43] [2025/7/25 10:12:43] 🔧 ModuleLoader | 🔧 許可アプリ: money, time, weight, health, todo, note, memo, calc, simple
+[2025/7/25 10:12:43] [2025/7/25 10:12:43] 🔧 ModuleLoader | 🔧 モジュールローダー初期化完了
+[2025/7/25 10:12:43] 🚀 CommonTemplate v2.0.0 初期化完了 | アプリ: SmartPersonalManager
+[2025/7/25 10:12:43] 🔄 v1.0.0 互換性モード対応
+Uncaught Exception: Error: listen EADDRINUSE: address already in use :::3001
+    at Server.setupListenHandle [as _listen2] (node:net:1940:16)
+    at listenInCluster (node:net:1997:12)
+    at Server.listen (node:net:2102:7)
+    at Function.listen (/mnt/c/Users/user/common-template-v0.9/node_modules/express/lib/application.js:635:24)
+    at CommonTemplate.start (/mnt/c/Users/user/common-template-v0.9/core/common.js:772:32)
+    at startServer (/mnt/c/Users/user/common-template-v0.9/server.js:23:13)
+    at Object.<anonymous> (/mnt/c/Users/user/common-template-v0.9/server.js:66:1)
+    at Module._compile (node:internal/modules/cjs/loader:1730:14)
+    at Object..js (node:internal/modules/cjs/loader:1895:10)
+    at Module.load (node:internal/modules/cjs/loader:1465:32) {
+  code: 'EADDRINUSE',
+  errno: -98,
+  syscall: 'listen',
+  address: '::',
+  port: 3001
+}

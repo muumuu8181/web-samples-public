@@ -1,0 +1,218 @@
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // SmartTemplateApp クラス（省略 - 既存実装を保持）
+        
+        // グローバル変数とアプリインスタンス
+        let app;
+        
+        window.addEventListener('load', () => {
+            app = new SmartTemplateApp();
+        });
+        
+        // 既存の関数（省略 - 全て保持）
+        
+        // ログ閲覧機能（複数キーワード対応版）
+        let currentLogData = [];
+        let allLogLines = [];
+        let isAllLogsMode = false;
+        let activeKeywords = [];
+        
+        function loadAllLogs() {
+            isAllLogsMode = true;
+            document.getElementById('logFileSelect').value = '';
+            
+            fetch('/api/logs/all')
+                .then(response => response.json())
+                .then(data => {
+                    allLogLines = data.lines;
+                    applyKeywordFilters();
+                    
+                    const display = document.getElementById('logDisplay');
+                    display.scrollTop = 0;
+                    
+                    console.log(`📚 全ログ一括表示: ${data.totalFiles}ファイル、${data.totalLines}行`);
+                })
+                .catch(error => {
+                    console.error('全ログの取得に失敗:', error);
+                    document.getElementById('logDisplay').textContent = '全ログの取得に失敗しました';
+                    allLogLines = [];
+                });
+        }
+        
+        function loadLogFiles() {
+            fetch('/api/logs/files')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('logFileSelect');
+                    select.innerHTML = '<option value="">個別ファイルを選択</option>';
+                    
+                    data.files.forEach(file => {
+                        const option = document.createElement('option');
+                        option.value = file.name;
+                        option.textContent = `${file.name} (${formatFileSize(file.size)}) - ${formatDate(file.modified)}`;
+                        select.appendChild(option);
+                    });
+                    
+                    console.log(`📋 ログファイル一覧更新: ${data.files.length}件`);
+                })
+                .catch(error => {
+                    console.error('ログファイル一覧の取得に失敗:', error);
+                    document.getElementById('logDisplay').textContent = 'ログファイル一覧の取得に失敗しました';
+                });
+        }
+        
+        function loadSelectedLog() {
+            const select = document.getElementById('logFileSelect');
+            const filename = select.value;
+            
+            isAllLogsMode = false;
+            
+            if (!filename) {
+                document.getElementById('logDisplay').textContent = '個別ファイルを選択するか、「全ログ一括表示」をご利用ください';
+                allLogLines = [];
+                return;
+            }
+            
+            fetch(`/api/logs/content/${filename}`)
+                .then(response => response.json())
+                .then(data => {
+                    allLogLines = data.lines;
+                    applyKeywordFilters();
+                    console.log(`📄 ログファイル読み込み: ${filename} (${data.totalLines}行)`);
+                })
+                .catch(error => {
+                    console.error('ログファイルの読み込みに失敗:', error);
+                    document.getElementById('logDisplay').textContent = 'ログファイルの読み込みに失敗しました';
+                    allLogLines = [];
+                });
+        }
+        
+        function addKeywordFilter() {
+            const searchInput = document.getElementById('logSearchInput');
+            const keyword = searchInput.value.trim();
+            
+            if (!keyword || activeKeywords.length >= 10) return;
+            
+            if (!activeKeywords.includes(keyword)) {
+                activeKeywords.push(keyword);
+                updateKeywordTags();
+                applyKeywordFilters();
+                searchInput.value = '';
+            }
+        }
+        
+        function removeKeywordFilter(keyword) {
+            activeKeywords = activeKeywords.filter(k => k !== keyword);
+            updateKeywordTags();
+            applyKeywordFilters();
+        }
+        
+        function updateKeywordTags() {
+            const container = document.getElementById('keywordTags');
+            container.innerHTML = '';
+            
+            activeKeywords.forEach(keyword => {
+                const tag = document.createElement('span');
+                tag.className = 'keyword-tag';
+                tag.innerHTML = `${keyword} <button onclick="removeKeywordFilter('${keyword}')" class="remove-keyword">&times;</button>`;
+                container.appendChild(tag);
+            });
+        }
+        
+        function applyKeywordFilters() {
+            if (activeKeywords.length === 0) {
+                displayLogLines(allLogLines);
+                updateSearchCount(allLogLines.length);
+                return;
+            }
+            
+            const filteredLines = allLogLines.filter(line => {
+                return activeKeywords.every(keyword => 
+                    line.content.toLowerCase().includes(keyword.toLowerCase())
+                );
+            });
+            
+            displayLogLines(filteredLines, activeKeywords);
+            updateSearchCount(filteredLines.length);
+        }
+        
+        function clearAllKeywords() {
+            activeKeywords = [];
+            updateKeywordTags();
+            displayLogLines(allLogLines);
+            updateSearchCount(allLogLines.length);
+        }
+        
+        function displayLogLines(lines, highlightKeywords = []) {
+            const display = document.getElementById('logDisplay');
+            
+            if (lines.length === 0) {
+                display.textContent = 'ログデータがありません';
+                return;
+            }
+            
+            const content = lines.map(line => {
+                let content = line.content;
+                let className = 'log-line';
+                
+                if (isAllLogsMode && line.isHeader) {
+                    className += ' log-header';
+                }
+                
+                if (highlightKeywords.length > 0) {
+                    highlightKeywords.forEach(keyword => {
+                        const regex = new RegExp(`(${escapeRegex(keyword)})`, 'gi');
+                        content = content.replace(regex, '<mark>$1</mark>');
+                    });
+                }
+                
+                let linePrefix = line.lineNumber.toString().padStart(4, ' ');
+                if (isAllLogsMode && line.fileName && !line.isHeader) {
+                    const filePrefix = line.fileName.substring(0, 4);
+                    linePrefix = `${filePrefix}:${line.lineNumber.toString().padStart(3, ' ')}`;
+                }
+                
+                return `<div class="${className}">${linePrefix}: ${content}</div>`;
+            }).join('');
+            
+            display.innerHTML = content;
+        }
+        
+        function updateSearchCount(count) {
+            document.getElementById('searchResultCount').textContent = `${count}件`;
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ja-JP');
+        }
+        
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+        
+        // エンターキー対応
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('logSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        addKeywordFilter();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

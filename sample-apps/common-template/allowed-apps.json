@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "description": "許可されたアプリモジュールのホワイトリスト",
+  "lastUpdated": "2025-07-24T14:10:00.000Z",
+  "allowedApps": [
+    "money",
+    "time", 
+    "weight",
+    "health",
+    "todo",
+    "note",
+    "memo",
+    "calc",
+    "simple"
+  ],
+  "comments": {
+    "money": "お金管理アプリ",
+    "time": "時間管理アプリ", 
+    "weight": "体重管理アプリ",
+    "health": "健康管理アプリ（将来用）",
+    "todo": "TODO管理アプリ（将来用）",
+    "note": "ノート管理アプリ（将来用）",
+    "memo": "メモ管理アプリ",
+    "calc": "計算機アプリ",
+    "simple": "シンプルサンプルアプリ（テンプレート用）"
+  },
+  "security": {
+    "whitelistOnly": true,
+    "preventPathTraversal": true,
+    "maxApps": 20
+  }
+}

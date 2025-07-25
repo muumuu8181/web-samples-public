@@ -1,0 +1,19 @@
+{
+  "exportInfo": {
+    "fileName": "test-download-2025-07-25.json",
+    "exportedAt": "2025-07-25T00:09:56.021Z",
+    "userInfo": {},
+    "testPurpose": "第三者による動作確認の証跡"
+  },
+  "testData": {
+    "success": true,
+    "testResults": [],
+    "kanbanActions": [],
+    "serverInfo": {
+      "appName": "SmartPersonalManager",
+      "version": "2.0.0",
+      "uptime": 466.7337124
+    }
+  },
+  "timestamp": "2025-07-25T00:09:56.021Z"
+}
