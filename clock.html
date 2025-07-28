@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>スタイリッシュ時計アプリ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06d6a0;
+            --dark-bg: #1f2937;
+            --light-bg: #f8fafc;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        }
+
+        .dark-glass-effect {
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .clock-canvas {
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+        }
+
+        .digital-time {
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        .theme-light {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .theme-dark {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+        }
+
+        .theme-neon {
+            background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
+        }
+
+        .theme-sunset {
+            background: linear-gradient(135deg, #ff9a8b 0%, #fecfef 50%, #fecfef 100%);
+        }
+
+        .glow {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 10px currentColor; }
+            to { box-shadow: 0 0 20px currentColor, 0 0 30px currentColor; }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .timer-display {
+            font-size: 3rem;
+            font-weight: bold;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .toolbar {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen theme-light">
+    <!-- ツールバー -->
+    <nav class="toolbar fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-clock text-2xl text-white"></i>
+                <h1 class="text-xl font-bold text-white">スタイリッシュ時計</h1>
+            </div>
+            
+            <!-- テーマ切り替え -->
+            <div class="flex items-center space-x-2">
+                <div class="theme-selector flex space-x-2">
+                    <button class="theme-btn w-8 h-8 rounded-full theme-light border-2 border-white" data-theme="light"></button>
+                    <button class="theme-btn w-8 h-8 rounded-full theme-dark border-2 border-white" data-theme="dark"></button>
+                    <button class="theme-btn w-8 h-8 rounded-full theme-neon border-2 border-white" data-theme="neon"></button>
+                    <button class="theme-btn w-8 h-8 rounded-full theme-sunset border-2 border-white" data-theme="sunset"></button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <div class="pt-20 min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-6xl w-full">
+            
+            <!-- タブナビゲーション -->
+            <div class="flex justify-center mb-8">
+                <div class="glass-effect rounded-full p-2">
+                    <div class="flex space-x-2">
+                        <button id="clockTab" class="tab-btn active px-6 py-3 rounded-full text-white font-semibold transition-all">
+                            <i class="fas fa-clock mr-2"></i>時計
+                        </button>
+                        <button id="timerTab" class="tab-btn px-6 py-3 rounded-full text-white font-semibold transition-all">
+                            <i class="fas fa-hourglass-half mr-2"></i>タイマー
+                        </button>
+                        <button id="stopwatchTab" class="tab-btn px-6 py-3 rounded-full text-white font-semibold transition-all">
+                            <i class="fas fa-stopwatch mr-2"></i>ストップウォッチ
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 時計セクション -->
+            <div id="clockSection" class="tab-content active">
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    
+                    <!-- アナログ時計 -->
+                    <div class="text-center">
+                        <div class="glass-effect rounded-3xl p-8 inline-block bounce-in">
+                            <canvas id="analogClock" width="300" height="300" class="clock-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- デジタル時計 -->
+                    <div class="text-center">
+                        <div class="glass-effect rounded-3xl p-8 fade-in">
+                            <div id="digitalTime" class="digital-time text-6xl font-bold text-white mb-4 glow">
+                                --:--:--
+                            </div>
+                            <div id="digitalDate" class="text-xl text-white opacity-80">
+                                ---- / -- / --
+                            </div>
+                            
+                            <!-- 表示切り替えボタン -->
+                            <div class="mt-6 flex justify-center space-x-4">
+                                <button id="toggleAnalog" class="btn-primary px-6 py-3 rounded-full text-white font-semibold">
+                                    <i class="fas fa-circle-notch mr-2"></i>アナログ表示
+                                </button>
+                                <button id="toggleDigital" class="btn-primary px-6 py-3 rounded-full text-white font-semibold">
+                                    <i class="fas fa-digital-tachograph mr-2"></i>デジタル表示
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- タイマーセクション -->
+            <div id="timerSection" class="tab-content hidden">
+                <div class="max-w-md mx-auto">
+                    <div class="glass-effect rounded-3xl p-8 text-center">
+                        <div id="timerDisplay" class="timer-display mb-6 glow">05:00</div>
+                        
+                        <!-- タイマー設定 -->
+                        <div class="grid grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <label class="block text-white text-sm mb-2">分</label>
+                                <input type="number" id="timerMinutes" min="0" max="99" value="5" 
+                                       class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white text-center border border-white border-opacity-30">
+                            </div>
+                            <div>
+                                <label class="block text-white text-sm mb-2">秒</label>
+                                <input type="number" id="timerSeconds" min="0" max="59" value="0" 
+                                       class="w-full p-2 rounded-lg bg-white bg-opacity-20 text-white text-center border border-white border-opacity-30">
+                            </div>
+                            <div class="flex items-end">
+                                <button id="setTimer" class="w-full btn-primary p-2 rounded-lg text-white font-semibold">
+                                    セット
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- タイマーコントロール -->
+                        <div class="flex justify-center space-x-4">
+                            <button id="startTimer" class="btn-primary px-6 py-3 rounded-full text-white font-semibold">
+                                <i class="fas fa-play mr-2"></i>開始
+                            </button>
+                            <button id="pauseTimer" class="btn-primary px-6 py-3 rounded-full text-white font-semibold" style="display: none;">
+                                <i class="fas fa-pause mr-2"></i>一時停止
+                            </button>
+                            <button id="resetTimer" class="btn-primary px-6 py-3 rounded-full text-white font-semibold">
+                                <i class="fas fa-redo mr-2"></i>リセット
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ストップウォッチセクション -->
+            <div id="stopwatchSection" class="tab-content hidden">
+                <div class="max-w-md mx-auto">
+                    <div class="glass-effect rounded-3xl p-8 text-center">
+                        <div id="stopwatchDisplay" class="timer-display mb-6 glow">00:00:00</div>
+                        
+                        <!-- ストップウォッチコントロール -->
+                        <div class="flex justify-center space-x-4 mb-6">
+                            <button id="startStopwatch" class="btn-primary px-6 py-3 rounded-full text-white font-semibold">
+                                <i class="fas fa-play mr-2"></i>開始
+                            </button>
+                            <button id="pauseStopwatch" class="btn-primary px-6 py-3 rounded-full text-white font-semibold" style="display: none;">
+                                <i class="fas fa-pause mr-2"></i>停止
+                            </button>
+                            <button id="resetStopwatch" class="btn-primary px-6 py-3 rounded-full text-white font-semibold">
+                                <i class="fas fa-redo mr-2"></i>リセット
+                            </button>
+                        </div>
+
+                        <!-- ラップタイム -->
+                        <div class="text-left">
+                            <h3 class="text-white text-lg font-semibold mb-3">ラップタイム</h3>
+                            <div id="lapTimes" class="space-y-2 max-h-32 overflow-y-auto">
+                                <p class="text-white opacity-60 text-sm">ラップタイムがここに表示されます</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="clock.js"></script>
+</body>
+</html>
