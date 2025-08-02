@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToDoアプリ - Firebase認証テンプレート使用例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        .template-info {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        .auth-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .login-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .status {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: stretch;
+        }
+
+        #todoInput {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #todoInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .add-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            min-width: 120px;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .add-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .todos-container {
+            text-align: left;
+        }
+
+        .todos-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .todo-item {
+            background: #f8f9fa;
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .todo-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .todo-text {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .todo-meta {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .footer-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 ToDoアプリ</h1>
+        
+        <div class="template-info">
+            <strong>🔧 Firebase認証テンプレート使用例</strong><br>
+            このアプリはテンプレートのコア機能を使用しています。<br>
+            設定は config/firebase-config.js で変更できます。
+        </div>
+        
+        <!-- 認証セクション -->
+        <div class="auth-section">
+            <div id="loginSection">
+                <p style="margin-bottom: 15px;">Googleアカウントでログインして、あなた専用のToDoリストを作成しましょう</p>
+                <button class="login-btn" onclick="login()">
+                    <span>🔐</span>
+                    Googleでログイン
+                </button>
+            </div>
+            
+            <div id="userSection" class="hidden">
+                <div class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User">
+                    <div>
+                        <div><strong id="userName"></strong></div>
+                        <div style="font-size: 0.8rem; color: #666;" id="userEmail"></div>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">ログアウト</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="appContent" class="hidden">
+            <div class="status disconnected" id="status">
+                🔄 データベースに接続中...
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="todoInput" placeholder="新しいタスクを入力..." />
+                <button class="add-btn" onclick="addTodo()" id="addBtn" disabled>追加</button>
+            </div>
+
+            <div class="todos-container">
+                <h2 class="todos-title">📋 <span id="userNameInTitle"></span>のToDo</h2>
+                <div id="todosList">
+                    <div class="empty-state">
+                        まだタスクがありません。<br>
+                        上の入力欄からタスクを追加してみてください！
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-info">
+                <strong>💡 テンプレート機能</strong><br>
+                ✅ ユーザー別データ分離<br>
+                ✅ リアルタイム同期<br>
+                ✅ 自動認証管理<br>
+                <strong>データパス:</strong> <code>users/<span id="userDataPath"></span>/todos</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <!-- 🚫 設定ファイル（要変更） -->
+    <script src="../config/firebase-config.js"></script>
+    <script src="../config/app-settings.js"></script>
+
+    <!-- 🔥 コア機能（触らない） -->
+    <script src="../core/firebase-auth.js"></script>
+    <script src="../core/firebase-data.js"></script>
+
+    <script>
+        // 🎯 アプリケーション固有のロジック
+        let authCore = null;
+        let dataCore = null;
+
+        // 初期化
+        function initApp() {
+            try {
+                // 🔥 コア機能を初期化
+                authCore = window.FirebaseAuthCore;
+                authCore.init(firebaseConfig);
+
+                dataCore = new FirebaseDataCore();
+                dataCore.init(firebaseConfig, 'todos');
+
+                // 🎯 イベントハンドラー設定
+                setupEventHandlers();
+                
+                console.log('✅ ToDoアプリ初期化完了');
+            } catch (error) {
+                console.error('❌ アプリ初期化失敗:', error);
+                alert('アプリの初期化に失敗しました: ' + error.message);
+            }
+        }
+
+        // イベントハンドラー設定
+        function setupEventHandlers() {
+            // 認証状態変更
+            authCore.onAuthStateChanged((user) => {
+                if (user) {
+                    showUserInterface(user);
+                    dataCore.setupUserData(user);
+                } else {
+                    showLoginInterface();
+                }
+            });
+
+            // データ変更
+            dataCore.onDataChange((todos) => {
+                displayTodos(todos);
+            });
+
+            // 接続状態変更
+            dataCore.onConnectionChange((connected) => {
+                updateConnectionStatus(connected);
+            });
+
+            // Enterキーでタスク追加
+            document.getElementById('todoInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addTodo();
+                }
+            });
+        }
+
+        // ログイン
+        async function login() {
+            try {
+                await authCore.signInWithGoogle();
+            } catch (error) {
+                alert('ログインに失敗しました: ' + error.message);
+            }
+        }
+
+        // ログアウト
+        async function logout() {
+            try {
+                await authCore.signOut();
+            } catch (error) {
+                alert('ログアウトに失敗しました: ' + error.message);
+            }
+        }
+
+        // ログイン画面表示
+        function showLoginInterface() {
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('userSection').classList.add('hidden');
+            document.getElementById('appContent').classList.add('hidden');
+        }
+
+        // ユーザーインターフェース表示
+        function showUserInterface(user) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('userSection').classList.remove('hidden');
+            document.getElementById('appContent').classList.remove('hidden');
+
+            // ユーザー情報表示
+            const userName = user.displayName || 'ユーザー';
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userNameInTitle').textContent = userName;
+            document.getElementById('userEmail').textContent = user.email || '';
+            document.getElementById('userAvatar').src = user.photoURL || 'https://via.placeholder.com/50';
+            document.getElementById('userDataPath').textContent = user.uid;
+        }
+
+        // 接続状態更新
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('status');
+            const addBtn = document.getElementById('addBtn');
+            
+            if (connected) {
+                statusEl.textContent = '✅ データベースに接続済み - リアルタイム同期中';
+                statusEl.className = 'status connected';
+                addBtn.disabled = false;
+            } else {
+                statusEl.textContent = '❌ データベース接続エラー';
+                statusEl.className = 'status disconnected';
+                addBtn.disabled = true;
+            }
+        }
+
+        // ToDo追加
+        async function addTodo() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            try {
+                await dataCore.addData({
+                    text: text,
+                    completed: false,
+                    priority: 'normal',
+                    category: 'general'
+                });
+                
+                input.value = '';
+                console.log('✅ ToDo追加成功:', text);
+            } catch (error) {
+                console.error('❌ ToDo追加失敗:', error);
+                alert('タスクの追加に失敗しました: ' + error.message);
+            }
+        }
+
+        // ToDo削除
+        async function deleteTodo(todoId) {
+            if (!confirm('このタスクを削除しますか？')) return;
+
+            try {
+                await dataCore.removeData(todoId);
+                console.log('✅ ToDo削除成功:', todoId);
+            } catch (error) {
+                console.error('❌ ToDo削除失敗:', error);
+                alert('タスクの削除に失敗しました: ' + error.message);
+            }
+        }
+
+        // ToDo表示
+        function displayTodos(todos) {
+            const todosList = document.getElementById('todosList');
+            
+            if (Object.keys(todos).length === 0) {
+                todosList.innerHTML = `
+                    <div class="empty-state">
+                        まだタスクがありません。<br>
+                        上の入力欄からタスクを追加してみてください！
+                    </div>
+                `;
+                return;
+            }
+
+            // 新しい順にソート
+            const sortedTodos = Object.entries(todos).sort((a, b) => {
+                const timeA = a[1].timestamp || 0;
+                const timeB = b[1].timestamp || 0;
+                return timeB - timeA;
+            });
+            
+            todosList.innerHTML = sortedTodos.map(([id, todo]) => `
+                <div class="todo-item">
+                    <button class="delete-btn" onclick="deleteTodo('${id}')">削除</button>
+                    <div class="todo-text">${todo.text}</div>
+                    <div class="todo-meta">
+                        <span>📱 ${todo.device || 'Unknown'}</span>
+                        <span>🕒 ${todo.timestamp ? new Date(todo.timestamp).toLocaleString() : '不明'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // アプリ開始
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>

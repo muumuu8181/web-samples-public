@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アンケートアプリ - Firebase認証テンプレート使用例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        .template-info {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #856404;
+        }
+
+        .privacy-notice {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #155724;
+        }
+
+        .auth-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 10px;
+            background: #f8f9fa;
+        }
+
+        .login-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #e8f5e8;
+            border-radius: 10px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .survey-form {
+            text-align: left;
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .question {
+            margin-bottom: 25px;
+        }
+
+        .question-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .radio-option:hover {
+            background: #e9ecef;
+        }
+
+        .radio-option input[type="radio"] {
+            margin: 0;
+        }
+
+        .submit-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.02);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .responses-section {
+            text-align: left;
+            margin-top: 30px;
+        }
+
+        .responses-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .response-item {
+            background: #fff;
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .response-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .response-data {
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .footer-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #1565c0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .survey-form {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 アンケートアプリ</h1>
+        
+        <div class="template-info">
+            <strong>🔧 Firebase認証テンプレート使用例</strong><br>
+            センシティブデータの管理例。プライバシー保護機能付き。
+        </div>
+
+        <div class="privacy-notice">
+            <strong>🔒 プライバシー保護</strong><br>
+            あなたの回答はマスキング処理されて保存されます。管理者でも具体的な内容は見ることができません。
+        </div>
+        
+        <!-- 認証セクション -->
+        <div class="auth-section">
+            <div id="loginSection">
+                <p style="margin-bottom: 15px;">匿名でアンケートに回答できます</p>
+                <button class="login-btn" onclick="login()">
+                    <span>🔐</span>
+                    Googleでログイン
+                </button>
+            </div>
+            
+            <div id="userSection" class="hidden">
+                <div class="user-info">
+                    <img id="userAvatar" class="user-avatar" src="" alt="User">
+                    <div>
+                        <div><strong id="userName"></strong></div>
+                        <div style="font-size: 0.8rem; color: #666;" id="userEmail"></div>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">ログアウト</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="appContent" class="hidden">
+            <!-- アンケートフォーム -->
+            <div class="survey-form">
+                <h3 style="margin-bottom: 20px; color: #333;">📝 ライフスタイルアンケート</h3>
+                
+                <div class="question">
+                    <label class="question-label">1. あなたの年齢層は？</label>
+                    <select id="age" class="form-select">
+                        <option value="">選択してください</option>
+                        <option value="10代">10代</option>
+                        <option value="20代">20代</option>
+                        <option value="30代">30代</option>
+                        <option value="40代">40代</option>
+                        <option value="50代以上">50代以上</option>
+                    </select>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">2. 好きな食べ物は？</label>
+                    <input type="text" id="food" class="form-input" placeholder="例：ラーメン、寿司など">
+                </div>
+
+                <div class="question">
+                    <label class="question-label">3. 休日の過ごし方は？</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="hobby" value="インドア派">
+                            <span>インドア派（読書、映画鑑賞など）</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="hobby" value="アウトドア派">
+                            <span>アウトドア派（スポーツ、登山など）</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="hobby" value="両方">
+                            <span>両方楽しむ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <label class="question-label">4. 理想のパートナーの特徴は？</label>
+                    <input type="text" id="partner" class="form-input" placeholder="例：優しい、面白い、頼りになるなど">
+                </div>
+
+                <div class="question">
+                    <label class="question-label">5. 将来の夢や目標は？</label>
+                    <textarea id="dream" class="form-input" rows="3" placeholder="自由にお答えください"></textarea>
+                </div>
+
+                <button class="submit-btn" onclick="submitSurvey()" id="submitBtn">
+                    🚀 回答を送信（マスキング処理されて保存されます）
+                </button>
+            </div>
+
+            <!-- 回答一覧 -->
+            <div class="responses-section">
+                <h2 class="responses-title">📊 回答一覧（マスキング済み）</h2>
+                <div id="responsesList">
+                    <div class="empty-state">
+                        まだ回答がありません
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-info">
+                <strong>🔒 プライバシー機能</strong><br>
+                ✅ 回答は自動的にマスキング処理<br>
+                ✅ 管理者でも具体的内容は非表示<br>
+                ✅ 統計分析は可能<br>
+                <strong>データパス:</strong> <code>users/<span id="userDataPath"></span>/surveys</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <!-- 🚫 設定ファイル（要変更） -->
+    <script src="../config/firebase-config.js"></script>
+    <script src="../config/app-settings.js"></script>
+
+    <!-- 🔥 コア機能（触らない） -->
+    <script src="../core/firebase-auth.js"></script>
+    <script src="../core/firebase-data.js"></script>
+
+    <script>
+        // 🎯 アプリケーション固有のロジック
+        let authCore = null;
+        let dataCore = null;
+
+        // 初期化
+        function initApp() {
+            try {
+                // 🔥 コア機能を初期化
+                authCore = window.FirebaseAuthCore;
+                authCore.init(firebaseConfig);
+
+                dataCore = new FirebaseDataCore();
+                dataCore.init(firebaseConfig, 'surveys');
+
+                // 🎯 イベントハンドラー設定
+                setupEventHandlers();
+                
+                console.log('✅ アンケートアプリ初期化完了');
+            } catch (error) {
+                console.error('❌ アプリ初期化失敗:', error);
+                alert('アプリの初期化に失敗しました: ' + error.message);
+            }
+        }
+
+        // イベントハンドラー設定
+        function setupEventHandlers() {
+            // 認証状態変更
+            authCore.onAuthStateChanged((user) => {
+                if (user) {
+                    showUserInterface(user);
+                    dataCore.setupUserData(user);
+                } else {
+                    showLoginInterface();
+                }
+            });
+
+            // データ変更
+            dataCore.onDataChange((responses) => {
+                displayResponses(responses);
+            });
+        }
+
+        // ログイン
+        async function login() {
+            try {
+                await authCore.signInWithGoogle();
+            } catch (error) {
+                alert('ログインに失敗しました: ' + error.message);
+            }
+        }
+
+        // ログアウト
+        async function logout() {
+            try {
+                await authCore.signOut();
+            } catch (error) {
+                alert('ログアウトに失敗しました: ' + error.message);
+            }
+        }
+
+        // ログイン画面表示
+        function showLoginInterface() {
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('userSection').classList.add('hidden');
+            document.getElementById('appContent').classList.add('hidden');
+        }
+
+        // ユーザーインターフェース表示
+        function showUserInterface(user) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('userSection').classList.remove('hidden');
+            document.getElementById('appContent').classList.remove('hidden');
+
+            // ユーザー情報表示
+            const userName = user.displayName || 'ユーザー';
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userEmail').textContent = user.email || '';
+            document.getElementById('userAvatar').src = user.photoURL || 'https://via.placeholder.com/50';
+            document.getElementById('userDataPath').textContent = user.uid;
+        }
+
+        // アンケート送信
+        async function submitSurvey() {
+            const formData = {
+                age: document.getElementById('age').value,
+                food: document.getElementById('food').value,
+                hobby: document.querySelector('input[name="hobby"]:checked')?.value || '',
+                partner: document.getElementById('partner').value,
+                dream: document.getElementById('dream').value
+            };
+
+            // 入力チェック
+            if (!formData.age || !formData.food || !formData.hobby) {
+                alert('必須項目を入力してください');
+                return;
+            }
+
+            try {
+                // マスキング処理を有効にしてデータを保存
+                await dataCore.addData({
+                    responses: formData,
+                    submittedAt: new Date().toISOString(),
+                    // センシティブフィールドを指定
+                    content: `${formData.food}, ${formData.partner}, ${formData.dream}`
+                }, true); // withMasking = true
+
+                // フォームクリア
+                document.getElementById('age').value = '';
+                document.getElementById('food').value = '';
+                document.getElementById('partner').value = '';
+                document.getElementById('dream').value = '';
+                document.querySelectorAll('input[name="hobby"]').forEach(radio => {
+                    radio.checked = false;
+                });
+
+                alert('✅ 回答を送信しました（マスキング処理済み）');
+                console.log('✅ アンケート送信成功');
+            } catch (error) {
+                console.error('❌ アンケート送信失敗:', error);
+                alert('送信に失敗しました: ' + error.message);
+            }
+        }
+
+        // 回答表示
+        function displayResponses(responses) {
+            const responsesList = document.getElementById('responsesList');
+            
+            if (Object.keys(responses).length === 0) {
+                responsesList.innerHTML = `
+                    <div class="empty-state">
+                        まだ回答がありません
+                    </div>
+                `;
+                return;
+            }
+
+            // 新しい順にソート
+            const sortedResponses = Object.entries(responses).sort((a, b) => {
+                const timeA = a[1].timestamp || 0;
+                const timeB = b[1].timestamp || 0;
+                return timeB - timeA;
+            });
+            
+            responsesList.innerHTML = sortedResponses.map(([id, response]) => {
+                const maskedContent = response.isMasked ? response.content : '*** マスキング処理済み ***';
+                
+                return `
+                    <div class="response-item">
+                        <div class="response-meta">
+                            📅 ${response.timestamp ? new Date(response.timestamp).toLocaleString() : '不明'}
+                            ${response.isMasked ? '🔒 マスキング済み' : ''}
+                        </div>
+                        <div class="response-data">
+                            <strong>年齢層:</strong> ${response.responses?.age || '未回答'}<br>
+                            <strong>好きな食べ物:</strong> ${maskedContent}<br>
+                            <strong>休日の過ごし方:</strong> ${response.responses?.hobby || '未回答'}<br>
+                            <strong>理想のパートナー:</strong> ${maskedContent}<br>
+                            <strong>将来の夢:</strong> ${maskedContent}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // アプリ開始
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
