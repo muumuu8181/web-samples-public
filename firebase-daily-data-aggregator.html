@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Firebase DB 毎日集計システム - データ長とサマリーの自動集計">
+    <title>🔥 Firebase DB 毎日集計システム</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --danger: #f44336;
+            --info: #2196F3;
+            --warning: #ff9800;
+            --bg: #f5f5f5;
+            --surface: #fff;
+            --text: #333;
+            --border: #ddd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Google認証ヘッダー */
+        header {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .auth-btn {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        /* データ集計パネル */
+        .aggregation-panel {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .date-picker {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        /* サマリーカード */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .summary-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .data-length { color: var(--primary); }
+        .record-count { color: var(--info); }
+        .avg-size { color: var(--warning); }
+        .storage-usage { color: var(--danger); }
+
+        /* データ詳細テーブル */
+        .data-table {
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 15px;
+            font-weight: bold;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 60px;
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+        }
+
+        .table-row:hover {
+            background: #f9f9f9;
+        }
+
+        /* 自動集計設定 */
+        .auto-aggregation {
+            background: #fff3cd;
+            border: 2px solid var(--warning);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .switch.active {
+            background: var(--primary);
+        }
+
+        .switch-handle {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .switch.active .switch-handle {
+            transform: translateX(30px);
+        }
+
+        /* ステータス表示 */
+        .status-info {
+            background: var(--surface);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-online { background: var(--primary); }
+        .status-offline { background: var(--danger); }
+        .status-processing { background: var(--warning); }
+
+        /* デバッグログシステム */
+        .debug-log {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #222;
+            color: #fff;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .debug-log.show {
+            display: block;
+        }
+
+        .debug-header {
+            background: #333;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+        }
+
+        .debug-content {
+            padding: 10px;
+        }
+
+        .debug-btn {
+            background: #555;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+
+        .debug-btn:hover {
+            background: #666;
+        }
+
+        .debug-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 1001;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 600px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-row {
+                grid-template-columns: 1fr 1fr;
+                grid-gap: 5px;
+            }
+            
+            .panel-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Google認証ヘッダー -->
+        <header>
+            <h1>🔥 Firebase DB 毎日集計システム</h1>
+            <div class="user-info" id="userInfo">
+                <button class="auth-btn" id="authBtn">Googleでログイン</button>
+            </div>
+        </header>
+
+        <!-- ステータス情報 -->
+        <div class="status-info" id="statusInfo">
+            <span class="status-indicator status-offline" id="statusIndicator"></span>
+            <span id="statusText">Firebase接続待機中...</span>
+        </div>
+
+        <!-- 自動集計設定 -->
+        <div class="auto-aggregation">
+            <h3>🤖 自動集計設定</h3>
+            <div class="toggle-switch">
+                <span>毎日自動集計:</span>
+                <div class="switch" id="autoSwitch" onclick="toggleAutoAggregation()">
+                    <div class="switch-handle"></div>
+                </div>
+                <span id="autoStatus">OFF</span>
+            </div>
+            <p style="font-size: 12px; color: #666;">
+                有効にすると毎日午前0時にデータ集計を自動実行します
+            </p>
+        </div>
+
+        <!-- データ集計パネル -->
+        <div class="aggregation-panel">
+            <div class="panel-header">
+                <div class="panel-title">📊 データ集計</div>
+                <div class="date-picker">
+                    <input type="date" id="targetDate" class="date-input">
+                    <button class="btn btn-primary" onclick="aggregateData()">集計実行</button>
+                    <button class="btn btn-info" onclick="aggregateAllDates()">全期間集計</button>
+                </div>
+            </div>
+
+            <!-- サマリーカード -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-label">総データ長</div>
+                    <div class="summary-value data-length" id="totalDataLength">0 KB</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">レコード数</div>
+                    <div class="summary-value record-count" id="totalRecords">0 件</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">平均サイズ</div>
+                    <div class="summary-value avg-size" id="avgSize">0 B</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-label">ストレージ使用量</div>
+                    <div class="summary-value storage-usage" id="storageUsage">0 %</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- データ詳細テーブル -->
+        <div class="data-table">
+            <div class="table-header">
+                📅 日別データ詳細
+            </div>
+            <div class="table-content" id="dataTableContent">
+                <div style="padding: 20px; text-align: center; color: #666;">
+                    データを集計してください
+                </div>
+            </div>
+        </div>
+
+        <!-- 新機能ボタン -->
+        <div class="aggregation-panel">
+            <h3 style="margin-bottom: 15px;">📊 データ操作</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                <button class="btn btn-primary" onclick="extractTodayInputData()">
+                    📅 本日入力データ抽出
+                </button>
+                <button class="btn btn-info" onclick="uploadToGitHub()">
+                    🚀 GitHubアップロード
+                </button>
+                <button class="btn btn-warning" onclick="checkFirebaseCost()">
+                    💰 Firebase料金チェック
+                </button>
+                <button class="btn btn-primary" onclick="exportData()">
+                    📤 データエクスポート
+                </button>
+            </div>
+        </div>
+
+        <!-- テストボタン -->
+        <div class="aggregation-panel">
+            <h3 style="margin-bottom: 15px;">🧪 システムテスト</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-info" onclick="testDataGeneration()">
+                    🧪 テストデータ生成
+                </button>
+                <button class="btn btn-warning" onclick="testAggregation()">
+                    📊 集計テスト
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- デバッグログシステム -->
+    <div class="debug-log" id="debugLog">
+        <div class="debug-header">
+            <span>🤖 Firebase集計システムログ</span>
+            <div>
+                <button class="debug-btn" onclick="copyDebugLog()">コピー</button>
+                <button class="debug-btn" onclick="downloadDebugLog()">📥ダウンロード</button>
+                <button class="debug-btn" onclick="clearDebugLog()">クリア</button>
+                <button class="debug-btn" onclick="toggleDebug()">閉じる</button>
+            </div>
+        </div>
+        <div class="debug-content" id="debugContent"></div>
+    </div>
+    <button class="debug-toggle" onclick="toggleDebug()">ログ</button>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyA5PXKChizYDCXF_GJ4KL6Ylq9K5hCPXWE",
+            authDomain: "shares-b1b97.firebaseapp.com",
+            databaseURL: "https://shares-b1b97-default-rtdb.firebaseio.com",
+            projectId: "shares-b1b97",
+            storageBucket: "shares-b1b97.firebasestorage.app",
+            messagingSenderId: "38311063248",
+            appId: "1:38311063248:web:0d2d5726d12b305b24b8d5",
+            measurementId: "G-S2ZMJH7CGC"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // メインアプリケーションクラス
+        class FirebaseDataAggregator {
+            constructor() {
+                this.currentUser = null;
+                this.autoAggregationEnabled = false;
+                this.aggregationData = {};
+                this.autoAggregationInterval = null;
+                
+                this.init();
+            }
+
+            init() {
+                this.log('=== 🔥 Firebase DB毎日集計システム 初期化開始 ===');
+                
+                this.setupAuth();
+                this.setupEventListeners();
+                this.loadSettings();
+                
+                // 今日の日付をデフォルトに設定
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('targetDate').value = today;
+                
+                this.log('=== Firebase DB毎日集計システム 初期化完了 ===');
+            }
+
+            log(message, data = null) {
+                const time = new Date().toLocaleTimeString();
+                const logMsg = `[${time}] ${message}`;
+                console.log(logMsg, data || '');
+                
+                const debugContent = document.getElementById('debugContent');
+                debugContent.innerHTML += `<div>${logMsg} ${data ? JSON.stringify(data) : ''}</div>`;
+                debugContent.scrollTop = debugContent.scrollHeight;
+            }
+
+            setupAuth() {
+                auth.onAuthStateChanged(user => {
+                    this.currentUser = user;
+                    this.updateUserUI();
+                    this.updateStatus();
+                    
+                    if (user) {
+                        this.log('ユーザーログイン完了', {
+                            email: user.email,
+                            uid: user.uid
+                        });
+                        this.updateStatus('online', `Firebase接続完了 - ${user.email}`);
+                    } else {
+                        this.log('ユーザーログアウト');
+                        this.updateStatus('offline', 'Firebase接続待機中...');
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // 30秒ごとに自動集計チェック（自動集計が有効な場合）
+                setInterval(() => {
+                    if (this.autoAggregationEnabled) {
+                        this.checkAutoAggregation();
+                    }
+                }, 30000);
+            }
+
+            updateUserUI() {
+                const userInfo = document.getElementById('userInfo');
+                if (this.currentUser) {
+                    userInfo.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span>${this.currentUser.displayName || this.currentUser.email}</span>
+                            <button class="auth-btn" onclick="signOut()">ログアウト</button>
+                        </div>
+                    `;
+                } else {
+                    userInfo.innerHTML = `
+                        <button class="auth-btn" onclick="signIn()">Googleでログイン</button>
+                    `;
+                }
+            }
+
+            updateStatus(status = 'offline', message = 'Firebase接続待機中...') {
+                const indicator = document.getElementById('statusIndicator');
+                const text = document.getElementById('statusText');
+                
+                indicator.className = `status-indicator status-${status}`;
+                text.textContent = message;
+            }
+
+            // Firebase DB全体のデータを集計
+            async aggregateData(targetDate = null) {
+                if (!this.currentUser) {
+                    alert('Googleログインが必要です');
+                    return;
+                }
+
+                const date = targetDate || document.getElementById('targetDate').value;
+                if (!date) {
+                    alert('日付を選択してください');
+                    return;
+                }
+
+                this.log('=== データ集計開始 ===', { targetDate: date });
+                this.updateStatus('processing', 'データ集計中...');
+
+                try {
+                    // Firebase DB全体から指定日のデータを取得
+                    const snapshot = await database.ref('/').once('value');
+                    const allData = snapshot.val() || {};
+                    
+                    // 指定日のデータを抽出・分析
+                    const dateAggregation = this.analyzeDataByDate(allData, date);
+                    
+                    // 結果を表示
+                    this.displayAggregationResults(dateAggregation);
+                    
+                    // 集計データを保存
+                    await this.saveAggregationResults(date, dateAggregation);
+                    
+                    this.log('✅ データ集計完了', dateAggregation);
+                    this.updateStatus('online', `集計完了 - ${dateAggregation.totalRecords}件のレコードを処理`);
+                    
+                } catch (error) {
+                    this.log('❌ データ集計エラー', error.message);
+                    this.updateStatus('offline', 'エラー: ' + error.message);
+                    alert('データ集計でエラーが発生しました: ' + error.message);
+                }
+            }
+
+            // 日付別データ分析
+            analyzeDataByDate(allData, targetDate) {
+                const analysis = {
+                    date: targetDate,
+                    totalDataLength: 0,
+                    totalRecords: 0,
+                    avgRecordSize: 0,
+                    dataByApp: {},
+                    dataByUser: {},
+                    timestamp: Date.now()
+                };
+
+                // 全データを走査してサイズ計算
+                const dataStr = JSON.stringify(allData);
+                analysis.totalDataLength = new Blob([dataStr]).size;
+
+                // アプリ別・ユーザー別・日付別に分析
+                this.traverseData(allData, '', analysis, targetDate);
+
+                // 平均レコードサイズ計算
+                if (analysis.totalRecords > 0) {
+                    analysis.avgRecordSize = Math.round(analysis.totalDataLength / analysis.totalRecords);
+                }
+
+                return analysis;
+            }
+
+            // データ走査（再帰的）
+            traverseData(data, path, analysis, targetDate) {
+                if (!data || typeof data !== 'object') return;
+
+                for (const [key, value] of Object.entries(data)) {
+                    const currentPath = path ? `${path}/${key}` : key;
+                    
+                    if (typeof value === 'object' && value !== null) {
+                        // 日付形式のキーをチェック（YYYY-MM-DD）
+                        if (key.match(/^\d{4}-\d{2}-\d{2}$/) && key === targetDate) {
+                            // 指定日のデータを詳細分析
+                            this.analyzeTargetDateData(value, currentPath, analysis);
+                        } else {
+                            // 再帰的に走査
+                            this.traverseData(value, currentPath, analysis, targetDate);
+                        }
+                    }
+                }
+            }
+
+            // 指定日データの詳細分析
+            analyzeTargetDateData(dateData, path, analysis) {
+                const dataStr = JSON.stringify(dateData);
+                const dataSize = new Blob([dataStr]).size;
+                
+                // レコード数をカウント
+                const recordCount = this.countRecords(dateData);
+                analysis.totalRecords += recordCount;
+
+                // アプリ別集計
+                const appName = path.split('/')[0] || 'unknown';
+                if (!analysis.dataByApp[appName]) {
+                    analysis.dataByApp[appName] = { size: 0, records: 0 };
+                }
+                analysis.dataByApp[appName].size += dataSize;
+                analysis.dataByApp[appName].records += recordCount;
+
+                // ユーザー別集計（パスにUIDが含まれる場合）
+                const pathParts = path.split('/');
+                const userUid = pathParts.find(part => part.length === 28); // Firebase UIDの長さ
+                if (userUid) {
+                    if (!analysis.dataByUser[userUid]) {
+                        analysis.dataByUser[userUid] = { size: 0, records: 0 };
+                    }
+                    analysis.dataByUser[userUid].size += dataSize;
+                    analysis.dataByUser[userUid].records += recordCount;
+                }
+
+                this.log('日付データ分析', {
+                    path: path,
+                    size: dataSize,
+                    records: recordCount,
+                    app: appName
+                });
+            }
+
+            // レコード数カウント
+            countRecords(data) {
+                if (!data || typeof data !== 'object') return 0;
+                
+                let count = 0;
+                for (const value of Object.values(data)) {
+                    if (typeof value === 'object' && value !== null) {
+                        // オブジェクトの場合は再帰的にカウント
+                        if (this.isRecord(value)) {
+                            count++;
+                        } else {
+                            count += this.countRecords(value);
+                        }
+                    }
+                }
+                return count;
+            }
+
+            // レコードかどうか判定（timestampやidフィールドがあるか）
+            isRecord(obj) {
+                return obj && typeof obj === 'object' && 
+                       (obj.hasOwnProperty('timestamp') || obj.hasOwnProperty('id') || obj.hasOwnProperty('amount'));
+            }
+
+            // 集計結果表示
+            displayAggregationResults(analysis) {
+                // サマリーカード更新
+                document.getElementById('totalDataLength').textContent = this.formatBytes(analysis.totalDataLength);
+                document.getElementById('totalRecords').textContent = analysis.totalRecords.toLocaleString() + ' 件';
+                document.getElementById('avgSize').textContent = this.formatBytes(analysis.avgRecordSize);
+                
+                // ストレージ使用量（Firebase制限との比較）
+                const firebaseLimit = 1024 * 1024 * 1024; // 1GB (無料プランの制限)
+                const usagePercent = (analysis.totalDataLength / firebaseLimit * 100).toFixed(2);
+                document.getElementById('storageUsage').textContent = usagePercent + ' %';
+
+                // 詳細テーブル更新
+                this.updateDataTable(analysis);
+            }
+
+            // データテーブル更新
+            updateDataTable(analysis) {
+                const tableContent = document.getElementById('dataTableContent');
+                let html = '';
+
+                // アプリ別データ表示
+                html += '<div style="padding: 15px; background: #f8f9fa; font-weight: bold;">📱 アプリ別データ</div>';
+                for (const [appName, data] of Object.entries(analysis.dataByApp)) {
+                    html += `
+                        <div class="table-row">
+                            <div>${appName}</div>
+                            <div>${this.formatBytes(data.size)}</div>
+                            <div>${data.records} 件</div>
+                            <div>${this.formatBytes(data.size / data.records || 0)}</div>
+                            <div>📊</div>
+                        </div>
+                    `;
+                }
+
+                // ユーザー別データ表示
+                if (Object.keys(analysis.dataByUser).length > 0) {
+                    html += '<div style="padding: 15px; background: #f8f9fa; font-weight: bold;">👥 ユーザー別データ</div>';
+                    for (const [userUid, data] of Object.entries(analysis.dataByUser)) {
+                        const displayUid = userUid.substring(0, 8) + '...';
+                        html += `
+                            <div class="table-row">
+                                <div>${displayUid}</div>
+                                <div>${this.formatBytes(data.size)}</div>
+                                <div>${data.records} 件</div>
+                                <div>${this.formatBytes(data.size / data.records || 0)}</div>
+                                <div>👤</div>
+                            </div>
+                        `;
+                    }
+                }
+
+                tableContent.innerHTML = html;
+            }
+
+            // バイト数フォーマット
+            formatBytes(bytes) {
+                if (bytes === 0) return '0 B';
+                const k = 1024;
+                const sizes = ['B', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // 集計結果をFirebaseに保存
+            async saveAggregationResults(date, analysis) {
+                try {
+                    const saveRef = database.ref(`data-aggregation/${this.currentUser.uid}/${date}`);
+                    await saveRef.set(analysis);
+                    this.log('集計結果保存完了', { date: date, path: saveRef.toString() });
+                } catch (error) {
+                    this.log('❌ 集計結果保存エラー', error.message);
+                }
+            }
+
+            // 全期間集計
+            async aggregateAllDates() {
+                if (!this.currentUser) {
+                    alert('Googleログインが必要です');
+                    return;
+                }
+
+                this.log('=== 全期間集計開始 ===');
+                
+                try {
+                    const snapshot = await database.ref('/').once('value');
+                    const allData = snapshot.val() || {};
+                    
+                    // 全日付を抽出
+                    const dates = this.extractDatesFromData(allData);
+                    this.log('発見された日付', dates);
+
+                    let totalProcessed = 0;
+                    for (const date of dates) {
+                        await this.aggregateData(date);
+                        totalProcessed++;
+                        this.log(`進捗: ${totalProcessed}/${dates.length}`, { currentDate: date });
+                    }
+
+                    this.log('✅ 全期間集計完了', { 
+                        totalDates: dates.length,
+                        processed: totalProcessed 
+                    });
+
+                } catch (error) {
+                    this.log('❌ 全期間集計エラー', error.message);
+                }
+            }
+
+            // データから日付を抽出
+            extractDatesFromData(data) {
+                const dates = new Set();
+                
+                const findDates = (obj, path = '') => {
+                    if (!obj || typeof obj !== 'object') return;
+                    
+                    for (const [key, value] of Object.entries(obj)) {
+                        // 日付形式のキーをチェック
+                        if (key.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                            dates.add(key);
+                        }
+                        if (typeof value === 'object' && value !== null) {
+                            findDates(value, path + '/' + key);
+                        }
+                    }
+                };
+
+                findDates(data);
+                return Array.from(dates).sort();
+            }
+
+            // 自動集計有効/無効切り替え
+            toggleAutoAggregation() {
+                this.autoAggregationEnabled = !this.autoAggregationEnabled;
+                
+                const autoSwitch = document.getElementById('autoSwitch');
+                const autoStatus = document.getElementById('autoStatus');
+                
+                if (this.autoAggregationEnabled) {
+                    autoSwitch.classList.add('active');
+                    autoStatus.textContent = 'ON';
+                    this.startAutoAggregation();
+                    this.log('🤖 自動集計システム有効化');
+                } else {
+                    autoSwitch.classList.remove('active');
+                    autoStatus.textContent = 'OFF';
+                    this.stopAutoAggregation();
+                    this.log('🤖 自動集計システム無効化');
+                }
+                
+                this.saveSettings();
+            }
+
+            // 自動集計開始
+            startAutoAggregation() {
+                // 毎日午前0時に実行するチェック
+                this.autoAggregationInterval = setInterval(() => {
+                    const now = new Date();
+                    if (now.getHours() === 0 && now.getMinutes() === 0) {
+                        const yesterday = new Date(now);
+                        yesterday.setDate(yesterday.getDate() - 1);
+                        const dateStr = yesterday.toISOString().split('T')[0];
+                        
+                        this.log('🤖 自動集計実行', { date: dateStr });
+                        this.aggregateData(dateStr);
+                    }
+                }, 60000); // 1分ごとにチェック
+            }
+
+            // 自動集計停止
+            stopAutoAggregation() {
+                if (this.autoAggregationInterval) {
+                    clearInterval(this.autoAggregationInterval);
+                    this.autoAggregationInterval = null;
+                }
+            }
+
+            // 自動集計チェック
+            checkAutoAggregation() {
+                // 現在時刻が午前0時00分の場合に前日のデータを集計
+                const now = new Date();
+                if (now.getHours() === 0 && now.getMinutes() === 0) {
+                    const yesterday = new Date(now);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const dateStr = yesterday.toISOString().split('T')[0];
+                    
+                    this.log('🤖 自動集計実行', { date: dateStr, time: now.toISOString() });
+                    this.aggregateData(dateStr);
+                }
+            }
+
+            // 設定保存
+            saveSettings() {
+                localStorage.setItem('firebase-aggregator-settings', JSON.stringify({
+                    autoAggregationEnabled: this.autoAggregationEnabled
+                }));
+            }
+
+            // 設定読み込み
+            loadSettings() {
+                const settings = JSON.parse(localStorage.getItem('firebase-aggregator-settings') || '{}');
+                if (settings.autoAggregationEnabled) {
+                    this.toggleAutoAggregation();
+                }
+            }
+
+            // テストデータ生成
+            async testDataGeneration() {
+                if (!this.currentUser) {
+                    alert('Googleログインが必要です');
+                    return;
+                }
+
+                this.log('🧪 テストデータ生成開始');
+                
+                const testDates = ['2025-08-15', '2025-08-14', '2025-08-13'];
+                const apps = ['webapp-template', 'money-tracker', 'test-app'];
+                
+                for (const date of testDates) {
+                    for (const app of apps) {
+                        const recordCount = Math.floor(Math.random() * 10) + 1;
+                        
+                        for (let i = 0; i < recordCount; i++) {
+                            const testRecord = {
+                                id: `test_${Date.now()}_${i}`,
+                                type: Math.random() > 0.5 ? 'income' : 'expense',
+                                amount: Math.floor(Math.random() * 10000) + 100,
+                                content: `テストデータ_${app}_${i}`,
+                                timestamp: Date.now() + i
+                            };
+
+                            const path = `${app}/${this.currentUser.uid}/${date}/${testRecord.id}`;
+                            await database.ref(path).set(testRecord);
+                        }
+                    }
+                }
+
+                this.log('✅ テストデータ生成完了', {
+                    dates: testDates.length,
+                    apps: apps.length,
+                    estimatedRecords: testDates.length * apps.length * 5
+                });
+            }
+
+            // 集計テスト
+            async testAggregation() {
+                this.log('🧪 集計テスト開始');
+                await this.aggregateData('2025-08-15');
+                this.log('✅ 集計テスト完了');
+            }
+
+            // 本日入力データのみ抽出
+            async extractTodayInputData() {
+                if (!this.currentUser) {
+                    alert('Googleログインが必要です');
+                    return;
+                }
+
+                const today = new Date().toISOString().split('T')[0];
+                this.log('📅 本日入力データ抽出開始', { date: today });
+                
+                try {
+                    // 全アプリから本日のデータを抽出
+                    const snapshot = await database.ref('/').once('value');
+                    const allData = snapshot.val() || {};
+                    
+                    const todayData = {};
+                    
+                    // 本日のデータのみを再帰的に抽出
+                    this.extractTodayDataRecursive(allData, '', todayData, today);
+                    
+                    // 抽出結果をダウンロード
+                    const exportData = {
+                        date: today,
+                        user: this.currentUser.email,
+                        extracted: new Date().toISOString(),
+                        totalRecords: this.countRecords(todayData),
+                        data: todayData
+                    };
+
+                    const dataStr = JSON.stringify(exportData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `today-input-data-${today}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    this.log('✅ 本日入力データ抽出完了', { 
+                        date: today,
+                        recordCount: exportData.totalRecords,
+                        fileSize: blob.size 
+                    });
+                    
+                } catch (error) {
+                    this.log('❌ 本日データ抽出エラー', error.message);
+                }
+            }
+
+            // 本日データ再帰抽出
+            extractTodayDataRecursive(data, path, result, targetDate) {
+                if (!data || typeof data !== 'object') return;
+
+                for (const [key, value] of Object.entries(data)) {
+                    if (key === targetDate && typeof value === 'object') {
+                        // 本日の日付キーを発見
+                        const pathParts = path.split('/').filter(p => p);
+                        let current = result;
+                        
+                        // パス構造を再現
+                        for (const part of pathParts) {
+                            if (!current[part]) current[part] = {};
+                            current = current[part];
+                        }
+                        current[key] = value;
+                        
+                        this.log('本日データ発見', { path: path + '/' + key, recordCount: this.countRecords(value) });
+                    } else if (typeof value === 'object' && value !== null) {
+                        this.extractTodayDataRecursive(value, path ? `${path}/${key}` : key, result, targetDate);
+                    }
+                }
+            }
+
+            // GitHubアップロード機能
+            async uploadToGitHub() {
+                if (!this.currentUser) {
+                    alert('Googleログインが必要です');
+                    return;
+                }
+
+                this.log('🚀 GitHubアップロード準備開始');
+                
+                try {
+                    // 集計データを取得
+                    const snapshot = await database.ref(`data-aggregation/${this.currentUser.uid}`).once('value');
+                    const aggregationData = snapshot.val() || {};
+                    
+                    // GitHubアップロード用のデータ準備
+                    const uploadData = {
+                        title: 'Firebase DB 毎日集計レポート',
+                        generated: new Date().toISOString(),
+                        user: this.currentUser.email,
+                        summary: {
+                            totalDates: Object.keys(aggregationData).length,
+                            latestDate: Math.max(...Object.keys(aggregationData).map(d => new Date(d).getTime())),
+                            totalRecords: Object.values(aggregationData).reduce((sum, data) => sum + (data.totalRecords || 0), 0)
+                        },
+                        data: aggregationData
+                    };
+
+                    // README形式のマークダウン生成
+                    const markdown = this.generateMarkdownReport(uploadData);
+                    
+                    // ファイルとして保存（GitHub手動アップロード用）
+                    const mdBlob = new Blob([markdown], { type: 'text/markdown' });
+                    const jsonBlob = new Blob([JSON.stringify(uploadData, null, 2)], { type: 'application/json' });
+                    
+                    // マークダウンファイルダウンロード
+                    const mdUrl = URL.createObjectURL(mdBlob);
+                    const mdA = document.createElement('a');
+                    mdA.href = mdUrl;
+                    mdA.download = `firebase-report-${new Date().toISOString().split('T')[0]}.md`;
+                    mdA.click();
+                    URL.revokeObjectURL(mdUrl);
+                    
+                    // JSONファイルダウンロード
+                    const jsonUrl = URL.createObjectURL(jsonBlob);
+                    const jsonA = document.createElement('a');
+                    jsonA.href = jsonUrl;
+                    jsonA.download = `firebase-data-${new Date().toISOString().split('T')[0]}.json`;
+                    jsonA.click();
+                    URL.revokeObjectURL(jsonUrl);
+
+                    this.log('✅ GitHubアップロード用ファイル生成完了', { 
+                        mdFileSize: mdBlob.size,
+                        jsonFileSize: jsonBlob.size,
+                        note: 'ダウンロードしたファイルを手動でGitHubにアップロードしてください'
+                    });
+                    
+                    alert('GitHubアップロード用ファイルをダウンロードしました。手動でGitHubリポジトリにアップロードしてください。');
+                    
+                } catch (error) {
+                    this.log('❌ GitHubアップロード準備エラー', error.message);
+                }
+            }
+
+            // マークダウンレポート生成
+            generateMarkdownReport(data) {
+                const latestDateStr = new Date(data.summary.latestDate).toLocaleDateString('ja-JP');
+                
+                return `# Firebase DB 毎日集計レポート
+
+## 📊 集計サマリー
+
+- **生成日時**: ${new Date(data.generated).toLocaleString('ja-JP')}
+- **ユーザー**: ${data.user}
+- **集計期間**: ${data.summary.totalDates} 日間
+- **最新データ**: ${latestDateStr}
+- **総レコード数**: ${data.summary.totalRecords.toLocaleString()} 件
+
+## 📅 日別データ
+
+${Object.entries(data.data).map(([date, info]) => `
+### ${date}
+- **レコード数**: ${info.totalRecords} 件
+- **データサイズ**: ${this.formatBytes(info.totalDataLength)}
+- **平均レコードサイズ**: ${this.formatBytes(info.avgRecordSize)}
+${info.dataByApp ? Object.entries(info.dataByApp).map(([app, appData]) => 
+`  - **${app}**: ${appData.records} 件 (${this.formatBytes(appData.size)})`).join('\n') : ''}
+`).join('\n')}
+
+## 🛠️ 生成システム
+
+このレポートは Firebase DB 毎日集計システムによって自動生成されました。
+
+- **システム**: firebase-daily-data-aggregator.html
+- **Firebase DB**: shares-b1b97
+- **自動集計**: 毎日午前0時実行
+
+---
+*Generated by Firebase DB 毎日集計システム*
+`;
+            }
+
+            // Firebase料金チェック
+            async checkFirebaseCost() {
+                this.log('💰 Firebase料金チェック開始');
+                
+                try {
+                    // Firebase DB全体のデータサイズを取得
+                    const snapshot = await database.ref('/').once('value');
+                    const allData = snapshot.val() || {};
+                    const dataStr = JSON.stringify(allData);
+                    const totalSize = new Blob([dataStr]).size;
+                    
+                    // Firebase料金計算（2025年料金体系）
+                    const pricing = {
+                        // Realtime Database料金（無料枠）
+                        freeTier: {
+                            storage: 1024 * 1024 * 1024, // 1GB
+                            bandwidth: 10 * 1024 * 1024 * 1024, // 10GB/月
+                            connections: 100
+                        },
+                        // 有料料金
+                        paid: {
+                            storagePerGB: 5, // $5/GB/月
+                            bandwidthPerGB: 1, // $1/GB
+                            connectionsPer100: 1 // $1/100同時接続
+                        }
+                    };
+                    
+                    const storageUsagePercent = (totalSize / pricing.freeTier.storage * 100).toFixed(2);
+                    const storageOverage = Math.max(0, totalSize - pricing.freeTier.storage);
+                    const estimatedMonthlyCost = (storageOverage / (1024 * 1024 * 1024)) * pricing.paid.storagePerGB;
+                    
+                    const costInfo = {
+                        totalDataSize: totalSize,
+                        formattedSize: this.formatBytes(totalSize),
+                        storageUsagePercent: storageUsagePercent,
+                        isOverFreeLimit: totalSize > pricing.freeTier.storage,
+                        freeLimit: this.formatBytes(pricing.freeTier.storage),
+                        overage: this.formatBytes(storageOverage),
+                        estimatedMonthlyCost: estimatedMonthlyCost.toFixed(2),
+                        recommendations: []
+                    };
+                    
+                    // 料金節約の推奨事項
+                    if (storageUsagePercent > 80) {
+                        costInfo.recommendations.push('⚠️ ストレージ使用量が80%を超えています');
+                    }
+                    if (costInfo.isOverFreeLimit) {
+                        costInfo.recommendations.push('💸 無料枠を超過しています。古いデータの削除を検討してください');
+                    }
+                    if (storageUsagePercent > 50) {
+                        costInfo.recommendations.push('📊 データ圧縮や不要レコードの削除を検討してください');
+                    }
+                    
+                    // コスト情報をUI表示用に更新
+                    this.displayCostInfo(costInfo);
+                    
+                    this.log('✅ Firebase料金チェック完了', costInfo);
+                    
+                } catch (error) {
+                    this.log('❌ 料金チェックエラー', error.message);
+                }
+            }
+
+            // コスト情報表示
+            displayCostInfo(costInfo) {
+                // ストレージ使用量カードを更新
+                const storageUsageElement = document.getElementById('storageUsage');
+                if (storageUsageElement) {
+                    storageUsageElement.textContent = costInfo.storageUsagePercent + ' %';
+                    storageUsageElement.style.color = costInfo.isOverFreeLimit ? 'var(--danger)' : 
+                                                    costInfo.storageUsagePercent > 80 ? 'var(--warning)' : 'var(--primary)';
+                }
+                
+                // アラート表示
+                if (costInfo.isOverFreeLimit) {
+                    alert(`⚠️ Firebase無料枠超過\n` +
+                          `現在の使用量: ${costInfo.formattedSize}\n` +
+                          `無料枠: ${costInfo.freeLimit}\n` +
+                          `超過分: ${costInfo.overage}\n` +
+                          `推定月額料金: $${costInfo.estimatedMonthlyCost}`);
+                } else {
+                    alert(`✅ Firebase料金チェック完了\n` +
+                          `現在の使用量: ${costInfo.formattedSize}\n` +
+                          `無料枠使用率: ${costInfo.storageUsagePercent}%\n` +
+                          `残り容量: ${this.formatBytes(1024*1024*1024 - costInfo.totalDataSize)}`);
+                }
+            }
+
+            // データエクスポート
+            async exportData() {
+                if (!this.currentUser) {
+                    alert('Googleログインが必要です');
+                    return;
+                }
+
+                this.log('📤 データエクスポート開始');
+                
+                try {
+                    const snapshot = await database.ref(`data-aggregation/${this.currentUser.uid}`).once('value');
+                    const aggregationData = snapshot.val() || {};
+                    
+                    const exportData = {
+                        user: this.currentUser.email,
+                        exported: new Date().toISOString(),
+                        aggregations: aggregationData
+                    };
+
+                    const dataStr = JSON.stringify(exportData, null, 2);
+                    const blob = new Blob([dataStr], { type: 'application/json' });
+                    
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `firebase-aggregation-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+
+                    this.log('✅ データエクスポート完了', { fileSize: blob.size });
+                    
+                } catch (error) {
+                    this.log('❌ エクスポートエラー', error.message);
+                }
+            }
+        }
+
+        // アプリ初期化
+        const aggregator = new FirebaseDataAggregator();
+
+        // グローバル関数
+        function signIn() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then(result => {
+                    aggregator.log('ログイン成功', result.user.email);
+                })
+                .catch(error => {
+                    aggregator.log('ログインエラー', error.message);
+                });
+        }
+
+        function signOut() {
+            auth.signOut();
+        }
+
+        function aggregateData() {
+            aggregator.aggregateData();
+        }
+
+        function aggregateAllDates() {
+            aggregator.aggregateAllDates();
+        }
+
+        function toggleAutoAggregation() {
+            aggregator.toggleAutoAggregation();
+        }
+
+        function testDataGeneration() {
+            aggregator.testDataGeneration();
+        }
+
+        function testAggregation() {
+            aggregator.testAggregation();
+        }
+
+        function extractTodayInputData() {
+            aggregator.extractTodayInputData();
+        }
+
+        function uploadToGitHub() {
+            aggregator.uploadToGitHub();
+        }
+
+        function checkFirebaseCost() {
+            aggregator.checkFirebaseCost();
+        }
+
+        function exportData() {
+            aggregator.exportData();
+        }
+
+        // デバッグログ関数
+        function toggleDebug() {
+            document.getElementById('debugLog').classList.toggle('show');
+        }
+
+        function copyDebugLog() {
+            const debugContent = document.getElementById('debugContent');
+            const text = debugContent.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('ログをコピーしました');
+            });
+        }
+
+        function downloadDebugLog() {
+            const debugContent = document.getElementById('debugContent');
+            const logText = debugContent.innerText;
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const filename = `firebase-aggregator-log_${timestamp}.txt`;
+            
+            const logHeader = [
+                '=== Firebase DB毎日集計システム Debug Log ===',
+                `Generated: ${new Date().toLocaleString('ja-JP')}`,
+                `User: ${aggregator.currentUser ? aggregator.currentUser.email : 'Guest'}`,
+                `URL: ${window.location.href}`,
+                '=' .repeat(50),
+                ''
+            ].join('\n');
+            
+            const fullLogContent = logHeader + logText;
+            
+            const blob = new Blob([fullLogContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            aggregator.log(`📥 ログファイル生成: ${filename}`, { fileSize: blob.size });
+        }
+
+        function clearDebugLog() {
+            document.getElementById('debugContent').innerHTML = '';
+            aggregator.log('ログクリア完了');
+        }
+    </script>
+</body>
+</html>
