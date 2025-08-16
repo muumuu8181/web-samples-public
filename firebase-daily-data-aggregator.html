@@ -448,6 +448,28 @@
                 </button>
             </div>
         </div>
+
+        <!-- タブレット専用デバッグツール -->
+        <div class="aggregation-panel">
+            <h3 style="margin-bottom: 15px;">📱 タブレット専用デバッグツール</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
+                <button class="btn btn-info" onclick="showDebugInfo()">
+                    🔍 システム情報表示
+                </button>
+                <button class="btn btn-warning" onclick="testFirebaseConnection()">
+                    🔥 Firebase接続テスト
+                </button>
+                <button class="btn btn-primary" onclick="showFullLog()">
+                    📋 フルログ表示
+                </button>
+                <button class="btn btn-info" onclick="exportDebugReport()">
+                    📊 デバッグレポート作成
+                </button>
+            </div>
+            <div id="tabletDebugOutput" style="background: #f8f9fa; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; display: none;">
+                <div id="tabletDebugContent"></div>
+            </div>
+        </div>
     </div>
 
     <!-- デバッグログシステム -->
@@ -591,12 +613,54 @@
                 this.updateStatus('processing', 'データ集計中...');
 
                 try {
-                    // Firebase DB全体から指定日のデータを取得
-                    const snapshot = await database.ref('/').once('value');
-                    const allData = snapshot.val() || {};
+                    // 権限テスト - まず小さなパスで権限確認
+                    this.log('Firebase権限テスト開始...');
+                    
+                    // ユーザー専用パスでテスト
+                    const userTestRef = database.ref(`data-aggregation/${this.currentUser.uid}/test`);
+                    await userTestRef.set({ test: true, timestamp: Date.now() });
+                    this.log('✅ ユーザー専用パス権限OK');
+                    
+                    // 権限エラー対策: ルートアクセスの代わりにユーザー認証済みパスのみアクセス
+                    this.log('認証済みパスからデータ取得開始...');
+                    
+                    // 複数の既知パスからデータを収集
+                    const knownPaths = [
+                        `webapp-template/${this.currentUser.uid}`,
+                        `data-aggregation/${this.currentUser.uid}`,
+                        `connection-test/${this.currentUser.uid}`,
+                        `realtime-test/${this.currentUser.uid}`
+                    ];
+                    
+                    let allData = {};
+                    let accessiblePaths = [];
+                    
+                    for (const path of knownPaths) {
+                        try {
+                            const snapshot = await database.ref(path).once('value');
+                            if (snapshot.exists()) {
+                                allData[path] = snapshot.val();
+                                accessiblePaths.push(path);
+                                this.log(`✅ アクセス成功: ${path}`, { hasData: true });
+                            } else {
+                                this.log(`📝 データなし: ${path}`, { hasData: false });
+                            }
+                        } catch (pathError) {
+                            this.log(`❌ アクセス不可: ${path}`, pathError.message);
+                        }
+                    }
+                    
+                    this.log('アクセス可能パス', { accessiblePaths: accessiblePaths, totalPaths: knownPaths.length });
                     
                     // 指定日のデータを抽出・分析
                     const dateAggregation = this.analyzeDataByDate(allData, date);
+                    
+                    // アクセス情報を追加
+                    dateAggregation.accessInfo = {
+                        accessiblePaths: accessiblePaths,
+                        totalPathsChecked: knownPaths.length,
+                        permissionNote: 'ユーザー認証済みパスのみアクセス（権限制限対応）'
+                    };
                     
                     // 結果を表示
                     this.displayAggregationResults(dateAggregation);
@@ -605,13 +669,55 @@
                     await this.saveAggregationResults(date, dateAggregation);
                     
                     this.log('✅ データ集計完了', dateAggregation);
-                    this.updateStatus('online', `集計完了 - ${dateAggregation.totalRecords}件のレコードを処理`);
+                    this.updateStatus('online', `集計完了 - ${dateAggregation.totalRecords}件のレコード、${accessiblePaths.length}パスからデータ取得`);
                     
                 } catch (error) {
                     this.log('❌ データ集計エラー', error.message);
-                    this.updateStatus('offline', 'エラー: ' + error.message);
-                    alert('データ集計でエラーが発生しました: ' + error.message);
+                    
+                    // 詳細なエラー情報を表示
+                    const errorInfo = {
+                        message: error.message,
+                        code: error.code,
+                        details: error.details,
+                        suggestion: 'Firebase Database Rules を確認してください。読み取り権限が必要です。'
+                    };
+                    
+                    this.log('エラー詳細', errorInfo);
+                    this.updateStatus('offline', 'Firebase権限エラー: Database Rules要確認');
+                    
+                    // Firebase Console URLを表示
+                    this.showFirebasePermissionHelp();
                 }
+            }
+
+            // Firebase権限ヘルプ表示
+            showFirebasePermissionHelp() {
+                const helpMessage = `
+🔥 Firebase権限エラーが発生しました
+
+【解決方法】
+1. Firebase Console を開く
+   https://console.firebase.google.com/
+
+2. プロジェクト「shares-b1b97」を選択
+
+3. 左メニュー「Realtime Database」→「ルール」タブ
+
+4. 以下のルールに変更：
+   {
+     "rules": {
+       ".read": "auth != null",
+       ".write": "auth != null"
+     }
+   }
+
+5. 「公開」ボタンをクリック
+
+現在はセキュリティのため認証済みユーザーのみアクセス可能です。
+                `;
+                
+                alert(helpMessage);
+                this.log('Firebase権限ヘルプ表示完了');
             }
 
             // 日付別データ分析
@@ -1375,6 +1481,107 @@ ${info.dataByApp ? Object.entries(info.dataByApp).map(([app, appData]) =>
         function clearDebugLog() {
             document.getElementById('debugContent').innerHTML = '';
             aggregator.log('ログクリア完了');
+        }
+
+        // タブレット専用デバッグ関数
+        function showDebugInfo() {
+            const debugOutput = document.getElementById('tabletDebugOutput');
+            const debugContent = document.getElementById('tabletDebugContent');
+            
+            const systemInfo = {
+                timestamp: new Date().toLocaleString('ja-JP'),
+                userAgent: navigator.userAgent,
+                screenSize: `${screen.width}x${screen.height}`,
+                viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+                deviceType: window.innerWidth < 768 ? 'Mobile' : window.innerWidth < 1024 ? 'Tablet' : 'Desktop',
+                online: navigator.onLine,
+                language: navigator.language,
+                platform: navigator.platform,
+                cookieEnabled: navigator.cookieEnabled,
+                firebaseUser: aggregator.currentUser ? aggregator.currentUser.email : 'ログインなし',
+                firebaseUID: aggregator.currentUser ? aggregator.currentUser.uid : 'N/A',
+                currentURL: window.location.href
+            };
+
+            let html = '<h4>🔍 システム情報</h4>';
+            for (const [key, value] of Object.entries(systemInfo)) {
+                html += `<div><strong>${key}:</strong> ${value}</div>`;
+            }
+
+            debugContent.innerHTML = html;
+            debugOutput.style.display = debugOutput.style.display === 'none' ? 'block' : 'none';
+            
+            aggregator.log('📱 システム情報表示', systemInfo);
+        }
+
+        function showFullLog() {
+            const debugOutput = document.getElementById('tabletDebugOutput');
+            const debugContent = document.getElementById('tabletDebugContent');
+            
+            const debugLogContent = document.getElementById('debugContent').innerHTML;
+            
+            debugContent.innerHTML = `
+                <h4>📋 フルログ</h4>
+                <div style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                    ${debugLogContent || 'ログがありません'}
+                </div>
+                <button onclick="copyFullLog()" style="margin-top: 10px; padding: 5px 10px;">📋 全ログコピー</button>
+            `;
+            
+            debugOutput.style.display = debugOutput.style.display === 'none' ? 'block' : 'none';
+            aggregator.log('📋 フルログ表示完了');
+        }
+
+        function copyFullLog() {
+            const debugLogContent = document.getElementById('debugContent').innerText;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(debugLogContent).then(() => {
+                    alert('✅ 全ログをクリップボードにコピーしました');
+                });
+            } else {
+                // フォールバック
+                const textarea = document.createElement('textarea');
+                textarea.value = debugLogContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ 全ログをクリップボードにコピーしました（フォールバック）');
+            }
+            aggregator.log('📋 全ログコピー完了');
+        }
+
+        function exportDebugReport() {
+            const systemInfo = {
+                timestamp: new Date().toLocaleString('ja-JP'),
+                userAgent: navigator.userAgent,
+                screenSize: `${screen.width}x${screen.height}`,
+                viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+                firebaseUser: aggregator.currentUser ? aggregator.currentUser.email : 'ログインなし',
+                firebaseUID: aggregator.currentUser ? aggregator.currentUser.uid : 'N/A'
+            };
+
+            const debugLogContent = document.getElementById('debugContent').innerText;
+            
+            const report = {
+                title: 'Firebase DB毎日集計システム - デバッグレポート',
+                generated: new Date().toISOString(),
+                systemInfo: systemInfo,
+                logs: debugLogContent,
+                note: 'タブレット専用デバッグツールで生成'
+            };
+
+            const reportStr = JSON.stringify(report, null, 2);
+            const blob = new Blob([reportStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `firebase-debug-report-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            aggregator.log('📊 デバッグレポート作成完了', { fileSize: blob.size });
         }
     </script>
 </body>
