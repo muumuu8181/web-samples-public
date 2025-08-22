@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER ZONE - Future Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #000;
+            color: #00ffff;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        /* カスタムカーソル */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+        
+        .cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: #00ffff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        /* 背景アニメーション */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .matrix-column {
+            position: absolute;
+            top: -100px;
+            font-size: 14px;
+            line-height: 1;
+            color: #00ff00;
+            opacity: 0.8;
+            animation: matrix-fall linear infinite;
+        }
+        
+        @keyframes matrix-fall {
+            0% { transform: translateY(-100px); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+        
+        /* メインコンテナ */
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: 20px;
+        }
+        
+        /* ヘッダー */
+        .cyber-header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .glitch {
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            position: relative;
+            display: inline-block;
+            animation: glitch 2s infinite;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .glitch::before {
+            animation: glitch-1 0.5s infinite;
+            color: #ff0040;
+            z-index: -1;
+        }
+        
+        .glitch::after {
+            animation: glitch-2 0.5s infinite;
+            color: #00ffff;
+            z-index: -2;
+        }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+        }
+        
+        @keyframes glitch-1 {
+            0%, 100% { transform: translate(0); }
+            10% { transform: translate(-2px, -2px); }
+            20% { transform: translate(2px, 2px); }
+            30% { transform: translate(-2px, 2px); }
+            40% { transform: translate(2px, -2px); }
+        }
+        
+        @keyframes glitch-2 {
+            0%, 100% { transform: translate(0); }
+            15% { transform: translate(2px, -2px); }
+            25% { transform: translate(-2px, 2px); }
+            35% { transform: translate(2px, 2px); }
+            45% { transform: translate(-2px, -2px); }
+        }
+        
+        /* ネオンボックス */
+        .neon-box {
+            background: rgba(0, 255, 255, 0.1);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px;
+            position: relative;
+            box-shadow: 
+                0 0 20px #00ffff,
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            animation: neon-pulse 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes neon-pulse {
+            from {
+                box-shadow: 
+                    0 0 20px #00ffff,
+                    inset 0 0 20px rgba(0, 255, 255, 0.1);
+            }
+            to {
+                box-shadow: 
+                    0 0 40px #00ffff,
+                    0 0 60px #00ffff,
+                    inset 0 0 40px rgba(0, 255, 255, 0.2);
+            }
+        }
+        
+        /* ボタンエフェクト */
+        .cyber-button {
+            background: transparent;
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            padding: 15px 30px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            margin: 10px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .cyber-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+        
+        .cyber-button:hover::before {
+            left: 100%;
+        }
+        
+        .cyber-button:hover {
+            box-shadow: 0 0 30px #00ffff;
+            transform: translateY(-2px);
+        }
+        
+        /* パーティクル */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        /* テキストエフェクト */
+        .type-writer {
+            font-size: 1.2rem;
+            color: #00ff00;
+            text-align: center;
+            margin: 20px 0;
+            overflow: hidden;
+            border-right: 2px solid #00ff00;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #00ff00; }
+        }
+        
+        /* グリッド背景 */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -2;
+            animation: grid-move 20s linear infinite;
+        }
+        
+        @keyframes grid-move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        
+        /* 3Dホログラム効果 */
+        .hologram {
+            position: relative;
+            transform-style: preserve-3d;
+            animation: hologram-rotate 10s linear infinite;
+        }
+        
+        @keyframes hologram-rotate {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        
+        .hologram::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 40%, rgba(0, 255, 255, 0.1) 50%, transparent 60%);
+            animation: hologram-scan 2s linear infinite;
+        }
+        
+        @keyframes hologram-scan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .glitch {
+                font-size: 2.5rem;
+            }
+            
+            .neon-box {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .cyber-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* ログセクション */
+        .log-section {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #00ffff;
+            border-radius: 5px;
+            padding: 15px;
+            min-width: 300px;
+            z-index: 1000;
+        }
+        
+        .log-display {
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            border-radius: 3px;
+            padding: 10px;
+            height: 120px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 10px;
+            resize: none;
+        }
+        
+        .log-buttons {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .log-btn {
+            padding: 5px 10px;
+            background: transparent;
+            color: #00ffff;
+            border: 1px solid #00ffff;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            font-family: 'Orbitron', monospace;
+        }
+        
+        .log-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- カスタムカーソル -->
+    <div class="cursor"></div>
+    
+    <!-- 背景エフェクト -->
+    <div class="grid-bg"></div>
+    <div class="matrix-bg" id="matrix"></div>
+    
+    <!-- メインコンテンツ -->
+    <div class="container">
+        <header class="cyber-header">
+            <h1 class="glitch hologram" data-text="CYBER ZONE">CYBER ZONE</h1>
+            <p class="type-writer">WELCOME TO THE FUTURE INTERFACE</p>
+        </header>
+        
+        <div class="neon-box">
+            <h2>NEURAL NETWORK INTERFACE</h2>
+            <p>Experience the ultimate cyberpunk aesthetic with real-time effects and animations.</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="cyber-button" onclick="triggerEffect('hack')">INITIATE HACK</button>
+                <button class="cyber-button" onclick="triggerEffect('scan')">SYSTEM SCAN</button>
+                <button class="cyber-button" onclick="triggerEffect('decrypt')">DECRYPT DATA</button>
+            </div>
+        </div>
+        
+        <div class="neon-box">
+            <h3>QUANTUM MATRIX STATUS</h3>
+            <div id="status-display">
+                <p>● NEURAL LINK: <span style="color: #00ff00;">ACTIVE</span></p>
+                <p>● FIREWALL: <span style="color: #ffff00;">MONITORING</span></p>
+                <p>● DATA STREAM: <span style="color: #00ffff;">FLOWING</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ログセクション -->
+    <div class="log-section">
+        <h4 style="color: #00ffff; margin-bottom: 10px; font-size: 12px;">SYSTEM LOG</h4>
+        <textarea class="log-display" id="logDisplay" readonly></textarea>
+        <div class="log-buttons">
+            <button class="log-btn" onclick="downloadLog()">EXPORT</button>
+            <button class="log-btn" onclick="clearLog()">PURGE</button>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let systemLog = [];
+        let particleCount = 0;
+        let effectActive = false;
+        
+        // システムログ機能
+        function addToLog(message, type = 'INFO') {
+            const timestamp = new Date().toLocaleTimeString('ja-JP');
+            const logEntry = `[${timestamp}] ${type}: ${message}`;
+            systemLog.push(logEntry);
+            updateLogDisplay();
+        }
+        
+        function updateLogDisplay() {
+            const logDisplay = document.getElementById('logDisplay');
+            logDisplay.value = systemLog.join('\n');
+            logDisplay.scrollTop = logDisplay.scrollHeight;
+        }
+        
+        function downloadLog() {
+            if (systemLog.length === 0) {
+                addToLog('Export failed: No data available', 'ERROR');
+                return;
+            }
+            
+            const logContent = systemLog.join('\n');
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cyber_system_log_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            addToLog(`Log exported: ${systemLog.length} entries`, 'SUCCESS');
+        }
+        
+        function clearLog() {
+            const logCount = systemLog.length;
+            systemLog = [];
+            updateLogDisplay();
+            addToLog(`Log purged: ${logCount} entries deleted`, 'SYSTEM');
+        }
+        
+        // カーソル追従
+        document.addEventListener('mousemove', (e) => {
+            const cursor = document.querySelector('.cursor');
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        
+        // マトリックス背景生成
+        function createMatrixRain() {
+            const matrix = document.getElementById('matrix');
+            const characters = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+            
+            for (let i = 0; i < 50; i++) {
+                const column = document.createElement('div');
+                column.className = 'matrix-column';
+                column.style.left = Math.random() * 100 + '%';
+                column.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                column.style.animationDelay = Math.random() * 2 + 's';
+                
+                let text = '';
+                for (let j = 0; j < 20; j++) {
+                    text += characters[Math.floor(Math.random() * characters.length)] + '<br>';
+                }
+                column.innerHTML = text;
+                
+                matrix.appendChild(column);
+            }
+        }
+        
+        // パーティクル生成
+        function createParticle(x, y) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 5 + 2;
+            const life = Math.random() * 100 + 50;
+            
+            document.body.appendChild(particle);
+            
+            let frame = 0;
+            const animate = () => {
+                frame++;
+                particle.style.left = (x + Math.cos(angle) * velocity * frame) + 'px';
+                particle.style.top = (y + Math.sin(angle) * velocity * frame) + 'px';
+                particle.style.opacity = 1 - (frame / life);
+                
+                if (frame < life) {
+                    requestAnimationFrame(animate);
+                } else {
+                    document.body.removeChild(particle);
+                }
+            };
+            
+            animate();
+        }
+        
+        // エフェクトトリガー
+        function triggerEffect(type) {
+            if (effectActive) return;
+            effectActive = true;
+            
+            addToLog(`Effect triggered: ${type.toUpperCase()}`, 'ACTION');
+            
+            switch (type) {
+                case 'hack':
+                    hackEffect();
+                    break;
+                case 'scan':
+                    scanEffect();
+                    break;
+                case 'decrypt':
+                    decryptEffect();
+                    break;
+            }
+            
+            setTimeout(() => {
+                effectActive = false;
+            }, 3000);
+        }
+        
+        function hackEffect() {
+            addToLog('Initiating neural hack sequence...', 'HACK');
+            const glitch = document.querySelector('.glitch');
+            glitch.style.animation = 'glitch 0.1s infinite';
+            
+            // パーティクル爆発
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    createParticle(
+                        Math.random() * window.innerWidth,
+                        Math.random() * window.innerHeight
+                    );
+                }, i * 50);
+            }
+            
+            setTimeout(() => {
+                glitch.style.animation = 'glitch 2s infinite';
+                addToLog('Hack sequence completed', 'SUCCESS');
+            }, 2000);
+        }
+        
+        function scanEffect() {
+            addToLog('Scanning quantum matrix...', 'SCAN');
+            const boxes = document.querySelectorAll('.neon-box');
+            
+            boxes.forEach((box, index) => {
+                setTimeout(() => {
+                    box.style.boxShadow = '0 0 50px #ff0040, inset 0 0 50px rgba(255, 0, 64, 0.3)';
+                    setTimeout(() => {
+                        box.style.boxShadow = '0 0 20px #00ffff, inset 0 0 20px rgba(0, 255, 255, 0.1)';
+                    }, 500);
+                }, index * 300);
+            });
+            
+            setTimeout(() => {
+                addToLog('Scan complete: 3 entities detected', 'SUCCESS');
+            }, 1500);
+        }
+        
+        function decryptEffect() {
+            addToLog('Decrypting data stream...', 'DECRYPT');
+            const statusDisplay = document.getElementById('status-display');
+            const originalContent = statusDisplay.innerHTML;
+            
+            // データ文字化け効果
+            let iterations = 0;
+            const scramble = setInterval(() => {
+                statusDisplay.innerHTML = originalContent.replace(/[A-Z]/g, () => {
+                    return String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                });
+                
+                iterations++;
+                if (iterations > 20) {
+                    clearInterval(scramble);
+                    statusDisplay.innerHTML = originalContent;
+                    addToLog('Data decryption successful', 'SUCCESS');
+                }
+            }, 100);
+        }
+        
+        // 自動パーティクル生成
+        setInterval(() => {
+            if (Math.random() < 0.3) {
+                createParticle(
+                    Math.random() * window.innerWidth,
+                    Math.random() * window.innerHeight
+                );
+            }
+        }, 2000);
+        
+        // 初期化
+        document.addEventListener('DOMContentLoaded', () => {
+            createMatrixRain();
+            addToLog('CYBER ZONE interface initialized', 'SYSTEM');
+            addToLog('Neural network connection established', 'NETWORK');
+            addToLog('All systems operational', 'STATUS');
+        });
+        
+        // ランダム効果
+        setInterval(() => {
+            if (Math.random() < 0.1) {
+                const effects = ['hack', 'scan', 'decrypt'];
+                const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+                addToLog(`Auto-trigger: ${randomEffect}`, 'AUTO');
+            }
+        }, 10000);
+    </script>
+</body>
+</html>
